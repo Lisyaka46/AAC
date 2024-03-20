@@ -76,7 +76,6 @@
             MinimumSize = new Size(0, 41);
             Name = "IELBuffer";
             Size = new Size(148, 148);
-            SizeChanged += IELBuffer_SizeChanged;
             pElements.ResumeLayout(false);
             pElements.PerformLayout();
             ResumeLayout(false);

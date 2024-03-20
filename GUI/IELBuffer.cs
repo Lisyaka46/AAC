@@ -88,7 +88,7 @@ namespace AAC.GUI
         /// <summary>
         /// Буфер визуализационного объекта
         /// </summary>
-        private Buffer BufferData { get; set; }
+        private Buffer BufferData;
 
         /// <summary>
         /// Счётчик скролл-бара
@@ -121,6 +121,13 @@ namespace AAC.GUI
                 else if (e.Delta > 0 && CounterScroll.Value > 0) CounterScroll.Value--;
                 ScrollBar.Value = CounterScroll.Value;
             };
+            SizeChanged += (sender, e) =>
+            {
+                ScrollBar.Location = new(Width, 0);
+                ScrollBar.Size = new(17, Height);
+                pElements.Size = new(Width - 19, Height);
+                lInfoZeroCommandBuffer.Location = new(pElements.Width / 2 - lInfoZeroCommandBuffer.Width / 2, 9);
+            };
         }
 
         /// <summary>
@@ -133,6 +140,13 @@ namespace AAC.GUI
             ElementsBuffer = new(BufferData.Length);
         }
 
+        /// <summary>
+        /// Сгенерировать объект команды
+        /// </summary>
+        /// <param name="Parent">Панель где находится объект</param>
+        /// <param name="Text">текст команды</param>
+        /// <param name="Index">Индекс позиции</param>
+        /// <returns>Объект команды буфера</returns>
         private static Label GenerateLabelBuffer(Panel Parent, string Text, int Index)
         {
             return new()
@@ -152,14 +166,10 @@ namespace AAC.GUI
             };
         }
 
-        private void IELBuffer_SizeChanged(object sender, EventArgs e)
-        {
-            ScrollBar.Location = new(Width, 0);
-            ScrollBar.Size = new(17, Height);
-            pElements.Size = new(Width - 19, Height);
-            lInfoZeroCommandBuffer.Location = new(pElements.Width / 2 - lInfoZeroCommandBuffer.Width / 2, 9);
-        }
-
+        /// <summary>
+        /// Добавить новый объект и настроить буфер
+        /// </summary>
+        /// <param name="Element">Текст команды</param>
         public void AddNewElement(string Element)
         {
             bool Append = BufferData.Add(Element);
@@ -178,6 +188,9 @@ namespace AAC.GUI
             }
         }
 
+        /// <summary>
+        /// Удалить все объекты буввера команд
+        /// </summary>
         public void DeleteAll()
         {
             if (BufferData.Count > CounterScroll.CountVisibleElements)

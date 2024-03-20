@@ -1460,7 +1460,6 @@ namespace AAC
             string text = (tbInput.Text ?? string.Empty).Replace("\r", string.Empty).Replace("\n", string.Empty);
             if (tbInput.Size.Width > 322) TbInputChangeLineText();
             PAC_Buffer.AddNewElement(text);
-            //MainData.Settings.BufferCommand.Add(text);
             Result = TypeCommand.ReadDefaultConsoleCommand(text).ExecuteCommand(true);
             UpdateDeveloperLabel(lDeveloper_StyleCommand, Result.State.ToString());
             Result.Summarize();
