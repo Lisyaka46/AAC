@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "AAC": {
+      "commandName": "Project",
+      "workingDirectory": "C:\\Users\\killm\\Рабочий стол\\Main\\Programm\\С#\\AACDL\\AACFiles\\bin\\x86\\Debug\\net8.0-windows7.0",
+      "sqlDebugging": true
+    }
+  }
+}
