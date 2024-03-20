@@ -21,12 +21,12 @@ namespace AAC.GUI
             /// <param name="Text">Текст элемента</param>
             /// <param name="Index">Индексированная позиция элемента в панели</param>
             /// <returns>Настроенный объект буфера</returns>
-            private delegate Label EventGenerateLabelAdd(Panel Parent, string Text, int Index);
+            public delegate Label EventGenerateLabelAdd(Panel Parent, string Text, int Index);
 
             /// <summary>
             /// Событие добавления объекта в буфер
             /// </summary>
-            private event EventGenerateLabelAdd GenerateLabel = GenerateLabelBuffer;
+            public event EventGenerateLabelAdd? GenerateLabel;
 
             /// <summary>
             /// Массив объектов буфера
@@ -60,6 +60,7 @@ namespace AAC.GUI
             /// <param name="Text">Текст объекта буфера</param>
             public void Add(Panel Parent, string Text)
             {
+                if (GenerateLabel == null) return;
                 if (Elements.Count < Length)
                 {
                     Label label = GenerateLabel.Invoke(Parent, Text, Elements.Count);
@@ -105,6 +106,7 @@ namespace AAC.GUI
             InitializeComponent();
             BufferData = new();
             ElementsBuffer = new(BufferData.Length);
+            ElementsBuffer.GenerateLabel += GenerateLabelBuffer;
             CounterScroll = new(0, 6);
             ScrollBar.ValueChanged += (sender, e) =>
             {

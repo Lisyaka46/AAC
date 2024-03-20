@@ -12,7 +12,7 @@
         /// <summary>
         /// Массив элементов буфера
         /// </summary>
-        private string[] BufferLabel { get; set; } = new string[Math.Clamp(CountBuffer, 4, 80)];
+        private string[] BufferElements = new string[Math.Clamp(CountBuffer, 4, 80)];
 
         /// <summary>
         /// Количество добавленных команд
@@ -22,7 +22,7 @@
         /// <summary>
         /// Общее количество мест в буфере
         /// </summary>
-        public int Length => BufferLabel.Length;
+        public int Length => BufferElements.Length;
 
         /// <summary>
         /// Индексатор буфера элементов
@@ -34,12 +34,12 @@
         {
             get
             {
-                if (key.Value < Length) return BufferLabel[key];
+                if (key.Value < Length) return BufferElements[key];
                 else throw new IndexOutOfRangeException($"Индекс ({key}) вышел за рамки буфера ({Length})");
             }
             private set
             {
-                if (key.Value < Length) BufferLabel[key] = value;
+                if (key.Value < Length) BufferElements[key] = value;
                 else throw new IndexOutOfRangeException($"Индекс ({key}) вышел за рамки буфера ({Length})");
             }
         }
@@ -51,7 +51,7 @@
         {
             if (Count > 0)
             {
-                BufferLabel = new string[BufferLabel.Length];
+                BufferElements = new string[BufferElements.Length];
                 Count = 0;
             }
         }
@@ -65,11 +65,11 @@
         /// <param name="Text">Текст элемента буфера</param>
         public bool Add(string Text)
         {
-            if (BufferLabel.Contains(Text) || Text.Length == 0) return false;
-            if (Count < BufferLabel.Length - 1) this[++Count] = Text;
+            if (BufferElements.Contains(Text) || Text.Length == 0) return false;
+            if (Count < BufferElements.Length - 1) this[++Count] = Text;
             else
             {
-                BufferLabel = [..BufferLabel.Skip(1)];
+                BufferElements = [..BufferElements.Skip(1)];
                 this[^1] = Text;
             }
             return true;
