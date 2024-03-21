@@ -87,7 +87,7 @@ namespace AAC
             /// <summary>
             /// Массив консольных команд
             /// </summary>
-            public TypeCommand.ConsoleCommand[] MassConsoleCommand { get; }
+            public ConsoleCommand[] MassConsoleCommand { get; }
 
             /// <summary>
             /// Массив голосовых команд
@@ -99,7 +99,7 @@ namespace AAC
             /// </summary>
             /// <param name="MCC">Консольные команды</param>
             /// <param name="MVC">Голосовые команды</param>
-            internal CommandData(TypeCommand.ConsoleCommand[] MCC, TypeCommand.VoiceCommand[] MVC)
+            internal CommandData(ConsoleCommand[] MCC, TypeCommand.VoiceCommand[] MVC)
             {
                 MassConsoleCommand = MCC;
                 MassVoiceCommand = MVC;
