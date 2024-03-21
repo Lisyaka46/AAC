@@ -78,7 +78,7 @@ namespace AAC.GUI
         {
             if (InfoLabel.Action == InfoLabelAccess.TypeActionLabel.InitializeCommand)
             {
-                ConsoleCommand Command = TypeCommand.ReadDefaultConsoleCommand(InfoLabel.Text);
+                ConsoleCommand Command = ConsoleCommand.ReadDefaultConsoleCommand(InfoLabel.Text);
                 Command.ExecuteCommand(false).Summarize();
             }
             else if (InfoLabel.Action == InfoLabelAccess.TypeActionLabel.OpenDirectoryElement) Process.Start("explorer.exe", InfoLabel.Text);

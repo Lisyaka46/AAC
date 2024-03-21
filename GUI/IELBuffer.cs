@@ -1,4 +1,5 @@
 ﻿using AAC.Classes;
+using AAC.Classes.Commands;
 using System.Xml.Linq;
 using static AAC.Classes.AnimationDL.Animate.AnimFormule;
 using static AAC.Forms_Functions;
@@ -66,7 +67,7 @@ namespace AAC.GUI
                     Label label = GenerateLabel.Invoke(Parent, Text, Elements.Count);
                     label.MouseEnter += (sender, e) => label.BackColor = ColorWhile.SetOffsetColor(label.BackColor, 30);
                     label.MouseLeave += (sender, e) => label.BackColor = ColorWhile.SetOffsetColor(label.BackColor, -30);
-                    label.Click += (sender, e) => TypeCommand.ReadDefaultConsoleCommand(label.Text).ExecuteCommand(false).Summarize();
+                    label.Click += (sender, e) => ConsoleCommand.ReadDefaultConsoleCommand(label.Text).ExecuteCommand(false).Summarize();
                     Elements.Add(label);
                 }
                 else

@@ -1,10 +1,7 @@
 using AAC.Classes;
 using AAC.GUI;
-using Microsoft.Speech.Synthesis;
-using System;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
-using System.Xml.Linq;
 using static AAC.Classes.AnimationDL.Animate.AnimColor;
 using static AAC.Classes.AnimationDL.Animate.AnimFormule;
 using static AAC.Classes.AnimationDL.Animate.AnimText;
@@ -12,6 +9,7 @@ using static AAC.Classes.MainTheme;
 using static AAC.Data;
 using static AAC.Forms_Functions;
 using static AAC.Startcs;
+using AAC.Classes.Commands;
 
 namespace AAC
 {
@@ -267,7 +265,7 @@ namespace AAC
             bRebootApplication.MouseClick += (sender, e) =>
             {
                 lInformationCursor.Hide();
-                TypeCommand.ReadDefaultConsoleCommand("reboot").ExecuteCommand(false);
+                ConsoleCommand.ReadDefaultConsoleCommand("reboot").ExecuteCommand(false);
             };
             bRebootApplication.MouseHover += (sender, e) => ActivateLabelInfo("Перезагружает программу");
             bRebootApplication.MouseLeave += (sender, e) => DisactivateLabelInfo();
@@ -285,7 +283,7 @@ namespace AAC
             PAC_bColoredTheme.ActivateButton += (KeyActivity) =>
             {
                 PAC_Disactivate();
-                TypeCommand.ReadDefaultConsoleCommand("colored").ExecuteCommand(false);
+                ConsoleCommand.ReadDefaultConsoleCommand("colored").ExecuteCommand(false);
             };
 
             // Кнопка в PAC "Изменить цвет текста"
@@ -299,14 +297,14 @@ namespace AAC
             PAC_bClearConsole.ActivateButton += (KeyActivity) =>
             {
                 PAC_Disactivate();
-                TypeCommand.ReadDefaultConsoleCommand("clear").ExecuteCommand(false);
+                ConsoleCommand.ReadDefaultConsoleCommand("clear").ExecuteCommand(false);
             };
 
             // Кнопка в PAC "Журнал сообщений"
             PAC_bLogMessage.ActivateButton += (KeyActivity) =>
             {
                 PAC_Disactivate();
-                TypeCommand.ReadDefaultConsoleCommand("log").ExecuteCommand(false);
+                ConsoleCommand.ReadDefaultConsoleCommand("log").ExecuteCommand(false);
             };
 
             //
@@ -946,7 +944,7 @@ namespace AAC
         private void BWhatInformation_MouseClick(object sender, MouseEventArgs e)
         {
             BWhatInformation_MouseLeave(null, null);
-            TypeCommand.ReadDefaultConsoleCommand("help").ExecuteCommand(false);
+            ConsoleCommand.ReadDefaultConsoleCommand("help").ExecuteCommand(false);
         }
 
         private void UpperPanelActivate(object sender, EventArgs e)
@@ -1447,7 +1445,7 @@ namespace AAC
             lDeveloper_SAW.Text = $"SAW: <{StateAnimWindow}>";
         }
 
-        private void ActivateLOG(object sender, EventArgs e) => TypeCommand.ReadDefaultConsoleCommand("log").ExecuteCommand(false);
+        private void ActivateLOG(object sender, EventArgs e) => ConsoleCommand.ReadDefaultConsoleCommand("log").ExecuteCommand(false);
 
         /// <summary>
         /// Активация команды через консоль
@@ -1460,7 +1458,7 @@ namespace AAC
             string text = (tbInput.Text ?? string.Empty).Replace("\r", string.Empty).Replace("\n", string.Empty);
             if (tbInput.Size.Width > 322) TbInputChangeLineText();
             PAC_Buffer.AddNewElement(text);
-            Result = TypeCommand.ReadDefaultConsoleCommand(text).ExecuteCommand(true);
+            Result = ConsoleCommand.ReadDefaultConsoleCommand(text).ExecuteCommand(true);
             UpdateDeveloperLabel(lDeveloper_StyleCommand, Result.State.ToString());
             Result.Summarize();
         }
