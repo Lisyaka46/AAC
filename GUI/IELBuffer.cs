@@ -3,6 +3,7 @@ using AAC.Classes.Commands;
 using System.Xml.Linq;
 using static AAC.Classes.AnimationDL.Animate.AnimFormule;
 using static AAC.Forms_Functions;
+using static AAC.GUI.IELBuffer.ListElementBuffer;
 using Buffer = AAC.Classes.Buffer;
 
 namespace AAC.GUI
@@ -13,7 +14,7 @@ namespace AAC.GUI
         /// Визуализационный объект буфера
         /// </summary>
         /// <param name="Length">Максимальное кол-во всетимых объектов</param>
-        public class ListElementBuffer(int Length)
+        public class ListElementBuffer(int Length, EventGenerateLabelAdd EventAdd)
         {
             /// <summary>
             /// Делегат события добваления элемента в буфер
@@ -27,7 +28,7 @@ namespace AAC.GUI
             /// <summary>
             /// Событие добавления объекта в буфер
             /// </summary>
-            public event EventGenerateLabelAdd? GenerateLabel;
+            public event EventGenerateLabelAdd GenerateLabel = EventAdd;
 
             /// <summary>
             /// Массив объектов буфера
@@ -61,7 +62,6 @@ namespace AAC.GUI
             /// <param name="Text">Текст объекта буфера</param>
             public void Add(Panel Parent, string Text)
             {
-                if (GenerateLabel == null) return;
                 if (Elements.Count < Length)
                 {
                     Label label = GenerateLabel.Invoke(Parent, Text, Elements.Count);
@@ -106,8 +106,7 @@ namespace AAC.GUI
         {
             InitializeComponent();
             BufferData = new();
-            ElementsBuffer = new(BufferData.Length);
-            ElementsBuffer.GenerateLabel += GenerateLabelBuffer;
+            ElementsBuffer = new(BufferData.Length, GenerateLabelBuffer);
             CounterScroll = new(0, 6);
             ScrollBar.ValueChanged += (sender, e) =>
             {
@@ -140,7 +139,7 @@ namespace AAC.GUI
         public void InitializeNewBuffer(int MaxElements = 50)
         {
             BufferData = new(Math.Clamp(MaxElements, 4, 80));
-            ElementsBuffer = new(BufferData.Length);
+            ElementsBuffer = new(BufferData.Length, GenerateLabelBuffer);
         }
 
         /// <summary>

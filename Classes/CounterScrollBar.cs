@@ -18,12 +18,12 @@
         /// <summary>
         /// Количество видимых элементов при старте
         /// </summary>
-        public int CountVisibleElements { get; }
+        public readonly int CountVisibleElements;
 
         /// <summary>
         /// Доля движения по одному объекту
         /// </summary>
-        public int TrafficShare { get; }
+        public readonly int TrafficShare;
 
         /// <summary>
         /// Инициализировать объект счётчика скролл-бара

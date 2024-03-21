@@ -65,7 +65,7 @@
         /// <param name="Text">Текст элемента буфера</param>
         public bool Add(string Text)
         {
-            if (BufferElements.Contains(Text) || Text.Length == 0) return false;
+            if (BufferElements.Contains(Text)) return false;
             if (Count < BufferElements.Length - 1) this[++Count] = Text;
             else
             {

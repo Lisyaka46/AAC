@@ -24,7 +24,7 @@ namespace AAC.Classes.Commands
         /// <summary>
         /// ID индификатор команды
         /// </summary>
-        public int ID { get; }
+        public readonly int ID;
 
         /// <summary>
         /// Параметры команды
@@ -34,7 +34,7 @@ namespace AAC.Classes.Commands
         /// <summary>
         /// Описание консольной команды
         /// </summary>
-        public string ExplanationCommand { get; }
+        public readonly string ExplanationCommand;
 
         /// <summary>
         /// Инициализировать объект консольной команды
