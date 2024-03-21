@@ -3,9 +3,26 @@ using Microsoft.Win32;
 using System.Diagnostics;
 using static AAC.Classes.AnimationDL.Animate.AnimFormule;
 using static AAC.Startcs;
+using AAC.Classes.DataClasses;
 
 namespace AAC
 {
+    /// <summary>
+    /// Направления сторон
+    /// </summary>
+    public enum DirectionsParties
+    {
+        /// <summary>
+        /// Левое направление
+        /// </summary>
+        Left = 1,
+
+        /// <summary>
+        /// Правое направление
+        /// </summary>
+        Right = 2
+    }
+
     public static class MiniFunctions
     {
 
@@ -37,31 +54,6 @@ namespace AAC
                     return OutputText;
             }
             return OutputText;
-        }
-
-        /// <summary>
-        /// Выполнить команду shell по индификатору indicator
-        /// </summary>
-        /// <param name="indicator"> Названия выполняющего программного действия shell</param>
-        public static void ShellGUID(string indicator)
-        {
-            string id_ = string.Empty;
-            switch (indicator)
-            {
-                case "DesktopVisualTrue":
-                    id_ = "3080F90D-D7AD-11D9-BD98-0000947B0257";
-                    break;
-                case "CommandPanelWin":
-                    id_ = "21EC2020-3AEA-1069-A2DD-08002B30309D";
-                    break;
-                case "Test":
-                    id_ = "BB06C0E4-D293-4f75-8A90-CB05B6477EEE";
-                    break;
-                case null:
-                    return;
-            }
-            Process.Start("explorer.exe", @"shell:::{" + id_ + @"}");
-            MainData.MainMP3.PlaySound("Complete");
         }
 
         /// <summary>
@@ -107,7 +99,7 @@ namespace AAC
         {
             MainData.MainMP3.PlaySound("Question");
             DialogResult Out = MessageBox.Show(InfoAction, NameAction, MessageBoxButtons.OKCancel, MessageBoxIcon.Information, MessageBoxDefaultButton.Button3);
-            MainData.Flags.ResultConfirmationAction = Out == DialogResult.Cancel ? Data.DialogWindowStatus.Cancel : Data.DialogWindowStatus.Ok;
+            MainData.Flags.ResultConfirmationAction = Out == DialogResult.Cancel ? DialogWindowStatus.Cancel : DialogWindowStatus.Ok;
         }
 
         /// <summary>

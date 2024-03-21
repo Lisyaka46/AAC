@@ -1,13 +1,10 @@
 ﻿using IWshRuntimeLibrary;
 using System.Diagnostics;
-using System.Runtime.InteropServices;
-using static AAC.Classes.AnimationDL.Animate.AnimText;
-using static AAC.Classes.TypeCommand;
-using static AAC.Startcs;
-using Microsoft.Speech.Recognition;
-using System.ComponentModel;
 using System.Text.RegularExpressions;
+using static AAC.Classes.AnimationDL.Animate.AnimText;
 using static AAC.MiniFunctions;
+using static AAC.Startcs;
+using AAC.Classes.DataClasses;
 
 namespace AAC.Classes.Commands
 {
@@ -525,7 +522,7 @@ namespace AAC.Classes.Commands
                         if (System.IO.File.Exists($"{Directory.GetCurrentDirectory()}\\Data\\Log\\{CommandParameters[0].Value}.txt"))
                         {
                             ActivateActionDialog("Удаление файла", $"Удалить файл {CommandParameters[0].Value}.txt");
-                            if (MainData.Flags.ResultConfirmationAction == Data.DialogWindowStatus.Ok)
+                            if (MainData.Flags.ResultConfirmationAction == DialogWindowStatus.Ok)
                             {
                                 System.IO.File.Delete($"{Directory.GetCurrentDirectory()}\\Data\\Log\\{CommandParameters[0].Value}.txt");
                                 animText = new(App.MainForm.tbOutput, $">>> Complete delete log file information {CommandParameters[0].Value}.txt\n");
@@ -544,7 +541,7 @@ namespace AAC.Classes.Commands
                     else
                     {
                         ActivateActionDialog("Удаление файлов log", "Удалить все файлы информации log");
-                        if (MainData.Flags.ResultConfirmationAction == Data.DialogWindowStatus.Ok)
+                        if (MainData.Flags.ResultConfirmationAction == DialogWindowStatus.Ok)
                         {
                             foreach (string file in Directory.GetFiles($"{Directory.GetCurrentDirectory()}\\Data\\Log\\"))
                                 System.IO.File.Delete($"{file}");

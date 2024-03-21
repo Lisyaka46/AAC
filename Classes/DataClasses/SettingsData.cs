@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
 using System.Text.RegularExpressions;
 
-namespace AAC
+namespace AAC.Classes.DataClasses
 {
 
     /// <summary>
@@ -240,7 +240,7 @@ namespace AAC
             {
                 if (Parameter.Value.GetType() == typeof(Color))
                 {
-                    MatchCollection ColorMatch = AAC.Data.ThemeData.RegexPatternColorPatamTheme().Matches((string)Value);
+                    MatchCollection ColorMatch = ThemeData.RegexPatternColorPatamTheme().Matches((string)Value);
                     if (Convert.ToInt32(ColorMatch[0].Value) > 255 || Convert.ToInt32(ColorMatch[1].Value) > 255 || Convert.ToInt32(ColorMatch[2].Value) > 255)
                         Fail(Parameter.GetType().Name, nameof(Parameter), Value.ToString() ?? string.Empty);
                     else Parameter.Value = Color.FromArgb(Convert.ToInt32(ColorMatch[0].Value), Convert.ToInt32(ColorMatch[1].Value), Convert.ToInt32(ColorMatch[2].Value));

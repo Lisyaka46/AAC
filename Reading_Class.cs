@@ -55,7 +55,7 @@ namespace AAC
         /// Прочитать базу данных консольных команд и создать массив консольных команд
         /// </summary>
         /// <returns>Массив консольных команд</returns>
-        public static TypeCommand.VoiceCommand[] ReadVoiceCommandDataBase()
+        public static VoiceCommand[] ReadVoiceCommandDataBase()
         {
             return [];
         }

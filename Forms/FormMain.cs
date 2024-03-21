@@ -6,10 +6,10 @@ using static AAC.Classes.AnimationDL.Animate.AnimColor;
 using static AAC.Classes.AnimationDL.Animate.AnimFormule;
 using static AAC.Classes.AnimationDL.Animate.AnimText;
 using static AAC.Classes.MainTheme;
-using static AAC.Data;
 using static AAC.Forms_Functions;
 using static AAC.Startcs;
 using AAC.Classes.Commands;
+using AAC.Classes.DataClasses;
 
 namespace AAC
 {
@@ -1353,7 +1353,7 @@ namespace AAC
                 Size StartTbOutPutSize = tbOutput.Size;
                 if (StartTbOutPutSize.Width == 771) pLabelExplorer.Location = new(604, pLabelExplorer.Location.Y);
                 int Height = tbOutput.Size.Height, Y = tbOutput.Location.Y;
-                MainData.Flags.ActiveMovingMainConsole = Data.BooleanFlags.True;
+                MainData.Flags.ActiveMovingMainConsole = BooleanFlags.True;
                 int StartActivePanelExplorerX = App.MainForm.pLabelExplorer.Location.X;
                 int pAllLabelExplorerEndX = pLabelExplorer.Location.X;
                 ConstAnimMove ConstFormuleW;
@@ -1418,7 +1418,7 @@ namespace AAC
 
         private void DeactiveTbOutPut(object sender, MouseEventArgs e)
         {
-            MainData.Flags.ActiveMovingMainConsole = Data.BooleanFlags.False;
+            MainData.Flags.ActiveMovingMainConsole = BooleanFlags.False;
         }
 
         /// <summary>
@@ -1709,7 +1709,7 @@ namespace AAC
                         {
                             await Task.Run(() =>
                             {
-                                Internet_Info.ImageLocation = $@"Data\Image\Internet{(InternetConnection ? "Activate" : "Disactivate")}.png";
+                                Internet_Info.ImageLocation = $@"Data\Image\Internet{(DLLMethods.InternetCheckConnection("https://ya.ru", 1, 0) ? "Activate" : "Disactivate")}.png";
                                 Internet_Info.Refresh();
                             });
 

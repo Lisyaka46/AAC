@@ -3,6 +3,7 @@ using AAC.GUI;
 using static AAC.Classes.AnimationDL.Animate.AnimFormule;
 using static AAC.Classes.MainTheme;
 using static AAC.Startcs;
+using AAC.Classes.DataClasses;
 
 namespace AAC.Forms
 {
@@ -144,7 +145,7 @@ namespace AAC.Forms
 
             pAllRegisteredThemes.MouseWheel += (sender, e) =>
             {
-                if (MainData.Flags.MiniPanelpMiniPanelActive == Data.BooleanFlags.True)
+                if (MainData.Flags.MiniPanelpMiniPanelActive == BooleanFlags.True)
                 {
                     if (e.Delta < 0 && vSBRegisteredThemes.Value != vSBRegisteredThemes.Maximum)
                     {
@@ -165,7 +166,7 @@ namespace AAC.Forms
             vSBRegisteredThemes.ValueChanged += (sender, e) =>
             {
                 if (!CloseMiniPanel) CloseMiniPanel = !CloseMiniPanel;
-                else if (CloseMiniPanel && MainData.Flags.MiniPanelpMiniPanelActive == Data.BooleanFlags.True) DeactivateMiniPanel();
+                else if (CloseMiniPanel && MainData.Flags.MiniPanelpMiniPanelActive == BooleanFlags.True) DeactivateMiniPanel();
                 MiniFunctions.MoveElementinVScrollBar(pAllElementsRegThemes, vSBRegisteredThemes);
             };
 
@@ -280,7 +281,7 @@ namespace AAC.Forms
             ActiveMiniPanel = false;
             ConstAnimMove ConstantFormule = new(pMiniPanel.Height, 0, 9);
             new ConstAnimMove(pMiniPanel.Width).InitAnimFormule(pMiniPanel, Formules.QuickTransition, ConstantFormule, AnimationStyle.Size);
-            MainData.Flags.MiniPanelpMiniPanelActive = Data.BooleanFlags.False;
+            MainData.Flags.MiniPanelpMiniPanelActive = BooleanFlags.False;
         }
 
         /// <summary>
@@ -332,7 +333,7 @@ namespace AAC.Forms
                 if (ActiveChangeParamColorTheme) ActiveChangeParamColorTheme = false;
             }
             //foreach (ELIlustrationTheme Element in MassThemePanel) Element.MainPanelTheme.Dispose();
-            MainData.Flags.MiniPanelpMiniPanelActive = Data.BooleanFlags.False;
+            MainData.Flags.MiniPanelpMiniPanelActive = BooleanFlags.False;
         }
 
         /// <summary>

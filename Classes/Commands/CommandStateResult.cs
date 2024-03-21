@@ -1,14 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static AAC.Classes.AnimationDL.Animate.AnimText;
-using static AAC.Classes.TypeCommand;
+﻿using static AAC.Classes.AnimationDL.Animate.AnimText;
 using static AAC.Startcs;
 
 namespace AAC.Classes.Commands
 {
+    /// <summary>
+    /// Конечные результаты выполнения команды
+    /// </summary>
+    public enum ResultStateCommand
+    {
+        /// <summary>
+        /// Команда не выполнилась
+        /// </summary>
+        Failed = 0,
+
+        /// <summary>
+        /// Команда выполнилась успешно
+        /// </summary>
+        Complete = 1
+    }
+
     /// <summary>
     /// Объект итогового состояния выполнения команды
     /// </summary>

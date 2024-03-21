@@ -6,6 +6,36 @@ using static AAC.Startcs;
 
 namespace AAC.Forms
 {
+    /// <summary>
+    /// Все страницы формы Settings
+    /// </summary>
+    public enum SettingsPage
+    {
+        /// <summary>
+        /// Форма отключена, Нет доступа к странице
+        /// </summary>
+        Null = 0,
+
+        /// <summary>
+        /// Главная страница (Главное меню)
+        /// </summary>
+        MainMenu = 1,
+
+        /// <summary>
+        /// Страница управление цветами (Палитра)
+        /// </summary>
+        Colored = 2,
+
+        /// <summary>
+        /// Страница PAC (Мини-панель)
+        /// </summary>
+        PAC = 3,
+
+        /// <summary>
+        /// Страница прочих параметров (Прочее..)
+        /// </summary>
+        Other = 4,
+    }
 
     public partial class FormMainSettings : Form
     {
@@ -32,12 +62,17 @@ namespace AAC.Forms
         /// <summary>
         /// Все страницы настроек
         /// </summary>
-        private List<Panel> Page { get; set; }
+        private readonly List<Panel> Page;
 
         /// <summary>
         /// Все Tool кнопки привязанные к страницам
         /// </summary>
-        private List<Button> ToolButtons { get; set; }
+        private readonly List<Button> ToolButtons;
+
+        /// <summary>
+        /// Статус активной страницы в форме Settings
+        /// </summary>
+        public SettingsPage ActiveSettingsPage { get; set; } = SettingsPage.MainMenu;
 
         /// <summary>
         /// Клавиши которые нельзя использовать для фиксации переключения Alt режима в PAC
@@ -53,7 +88,6 @@ namespace AAC.Forms
             InitializeComponent();
             UpdatePositionImageAutor = true;
 
-            MainData.Flags.ActiveSettingsPage = SettingsPage.MainMenu;
             ActivePanel = pMainMenu;
             bToolMainMenu.BackColor = Color.FromArgb(170, 240, 209);
 
@@ -141,10 +175,10 @@ namespace AAC.Forms
         {
             Size SizedPanel = new(Size.Width - 16, Size.Height - 69);
 
-            if (MainData.Flags.ActiveSettingsPage != SettingsPage.MainMenu) pMainMenu.Location = new(Size.Width + 2, pMainMenu.Location.Y);
-            if (MainData.Flags.ActiveSettingsPage != SettingsPage.Colored) pColored.Location = new(Size.Width + 2, pColored.Location.Y);
-            if (MainData.Flags.ActiveSettingsPage != SettingsPage.Other) pOther.Location = new(Size.Width + 2, pOther.Location.Y);
-            if (MainData.Flags.ActiveSettingsPage != SettingsPage.PAC) pPAC.Location = new(Size.Width + 2, pPAC.Location.Y);
+            if (ActiveSettingsPage != SettingsPage.MainMenu) pMainMenu.Location = new(Size.Width + 2, pMainMenu.Location.Y);
+            if (ActiveSettingsPage != SettingsPage.Colored) pColored.Location = new(Size.Width + 2, pColored.Location.Y);
+            if (ActiveSettingsPage != SettingsPage.Other) pOther.Location = new(Size.Width + 2, pOther.Location.Y);
+            if (ActiveSettingsPage != SettingsPage.PAC) pPAC.Location = new(Size.Width + 2, pPAC.Location.Y);
 
             foreach (Panel Element in Page)
             {
@@ -188,7 +222,7 @@ namespace AAC.Forms
                         new ConstAnimMove(ToolButtons[index].Location.X + (index > i ? -15 : 15), ToolButtons[index].Location.X, 6)
                             .InitAnimFormule(ToolButtons[index], Formules.QuickTransition, new ConstAnimMove(ToolButtons[index].Location.Y), AnimationStyle.XY);
 
-                        MainData.Flags.ActiveSettingsPage = (SettingsPage)(i + 1);
+                        ActiveSettingsPage = (SettingsPage)(i + 1);
                         Page[i].Location = new(Page[i].Location.X, ActivePanel.Location.Y);
                         MiniFunctions.OpenNewMiniMenu(Page[i], ActivePanel, pToolButton.Size.Height,
                             index > i ? DirectionsParties.Left : DirectionsParties.Right, y: y);
@@ -203,7 +237,7 @@ namespace AAC.Forms
 
         private void FormCloseding(object sender, FormClosingEventArgs e)
         {
-            MainData.Flags.ActiveSettingsPage = SettingsPage.Null;
+            ActiveSettingsPage = SettingsPage.Null;
             if (App.MainForm.ChangeLengthBuffer != -1)
             {
                 MainData.Settings.SetParamOption("Count-Buffer", App.MainForm.ChangeLengthBuffer.ToString());

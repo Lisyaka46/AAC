@@ -111,14 +111,12 @@
   <ItemGroup>
     <PackageReference Include="NAudio" Version="2.2.1" />
     <PackageReference Include="System.Data.OleDb" Version="8.0.0" />
+    <PackageReference Include="System.Speech" Version="8.0.0" />
   </ItemGroup>
 
   <ItemGroup>
     <Reference Include="Microsoft.DirectX.AudioVideoPlayback">
       <HintPath>..\..\..\..\..\..\..\..\..\Windows\assembly\GAC\Microsoft.DirectX.AudioVideoPlayback\1.0.2902.0__31bf3856ad364e35\Microsoft.DirectX.AudioVideoPlayback.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Speech">
-      <HintPath>bin\x86\Debug\net8.0-windows7.0\Microsoft.Speech.dll</HintPath>
     </Reference>
   </ItemGroup>
 

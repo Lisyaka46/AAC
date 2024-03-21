@@ -1,13 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+﻿using static AAC.Classes.DataClasses.SettingsData;
 
 namespace AAC.GUI
 {
@@ -16,12 +7,12 @@ namespace AAC.GUI
         /// <summary>
         /// Объект информации параметра
         /// </summary>
-        private SettingsData.SettingsBoolParameter? BoolParameter_;
+        private SettingsBoolParameter? BoolParameter_;
 
         /// <summary>
         /// объект параметра на который ссылается объект
         /// </summary>
-        public SettingsData.SettingsBoolParameter? BoolParameter
+        public SettingsBoolParameter? BoolParameter
         {
             get => BoolParameter_;
             set

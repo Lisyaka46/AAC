@@ -1,4 +1,4 @@
-﻿namespace AAC
+﻿namespace AAC.Classes.Commands
 {
     /// <summary>
     /// Команда Soft
