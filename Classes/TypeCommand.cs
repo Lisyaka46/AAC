@@ -76,27 +76,6 @@ namespace AAC.Classes
         }
 
         /// <summary>
-        /// Параметер команды
-        /// </summary>
-        /// <remarks>
-        /// Инициализировать объект параметра команды
-        /// </remarks>
-        /// <param name="NameParameter">Имя параметра</param>
-        /// <param name="value">Значение параметра</param>
-        public class Parameter(string NameParameter, string value)
-        {
-            /// <summary>
-            /// Имя параметра команды
-            /// </summary>
-            public string Name { get; } = NameParameter;
-
-            /// <summary>
-            /// Значение параметра команды
-            /// </summary>
-            public string Value { get; set; } = value;
-        }
-
-        /// <summary>
         /// Проверка голосовой команды на распознавание
         /// </summary>
         /// <param name="sender">Объект проверки</param>

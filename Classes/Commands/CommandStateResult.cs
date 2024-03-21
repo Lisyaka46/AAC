@@ -17,17 +17,22 @@ namespace AAC.Classes.Commands
         /// <summary>
         /// Итоговое состояние команды
         /// </summary>
-        public ResultStateCommand State { get; }
+        public readonly ResultStateCommand State;
 
         /// <summary>
         /// Сообщение в LOG
         /// </summary>
-        public string LOGMassage { get; }
+        public readonly string LOGMassage;
 
         /// <summary>
         /// Сообщение в консольную строку
         /// </summary>
-        public string Massage { get; }
+        public readonly string Massage;
+
+        /// <summary>
+        /// Успешный итог выполнения команды
+        /// </summary>
+        public static CommandStateResult Completed => new(ResultStateCommand.Complete, string.Empty, string.Empty);
 
         /// <summary>
         /// Инициализировать объект итога выполнения команды
@@ -41,11 +46,6 @@ namespace AAC.Classes.Commands
             this.Massage = Massage;
             LOGMassage = Massage_log;
         }
-
-        /// <summary>
-        /// Успешный итог выполнения команды
-        /// </summary>
-        public static CommandStateResult Completed => new(ResultStateCommand.Complete, string.Empty, string.Empty);
 
         /// <summary>
         /// Выполнить обычные действия подведения итога команды
