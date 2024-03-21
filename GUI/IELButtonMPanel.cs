@@ -18,7 +18,7 @@ namespace AAC.GUI
         /// <summary>
         /// Символ клавиши
         /// </summary>
-        private Keys AltIndexKey_ { get; set; }
+        private Keys AltIndexKey_;
 
         /// <summary>
         /// Свойство клавиши отвечающая за исполнение команды
@@ -36,7 +36,7 @@ namespace AAC.GUI
         /// <summary>
         /// Состояние активности видимости переходного элемента
         /// </summary>
-        private bool SwitchArrow_ { get; set; }
+        private bool SwitchArrow_;
 
         /// <summary>
         /// Свойство активности переходного элемента
@@ -55,7 +55,7 @@ namespace AAC.GUI
         /// <summary>
         /// Состояние активности управления элементом с помощью клавиши
         /// </summary>
-        private bool AltIndexActivity_ { get; set; }
+        private bool AltIndexActivity_;
 
         /// <summary>
         /// Свойство управления элементом с помощью клавиши
@@ -77,7 +77,7 @@ namespace AAC.GUI
         /// <summary>
         /// Отображаемый текст в кнопке
         /// </summary>
-        private string ButtonText_ { get; set; } = string.Empty;
+        private string ButtonText_ = string.Empty;
 
         /// <summary>
         /// Свойство текста кнопки
@@ -185,7 +185,7 @@ namespace AAC.GUI
         /// </summary>
         /// <param name="key">Ключ клавиши</param>
         /// <returns>Символ клавиатуры</returns>
-        static string KeyToCharKeyboard(Keys key) => key switch
+        private static string KeyToCharKeyboard(Keys key) => key switch
         {
             Keys.Oem2 => "/",
             Keys.Oem3 => "~",
