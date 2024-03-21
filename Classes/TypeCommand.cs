@@ -1,4 +1,5 @@
-﻿using IWshRuntimeLibrary;
+﻿using AAC.Classes.Commands;
+using IWshRuntimeLibrary;
 using Microsoft.Speech.Recognition;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -152,50 +153,6 @@ namespace AAC.Classes
         }
 
         /// <summary>
-        /// Прочитать команду из консоли
-        /// </summary>
-        /// <param name="TextCommand">Читаемая команда</param>
-        /// <returns></returns>
-        public static ConsoleCommand ReadDefaultConsoleCommand(string TextCommand)
-        {
-            ObjLog.LOGTextAppend($"Начинаю читать команду <{TextCommand}>");
-            while (TextCommand.Length > 0)
-            {
-                if (TextCommand[^1] == ' ') TextCommand = TextCommand.Remove(TextCommand.Length - 1);
-                else if (TextCommand.Contains("  ")) TextCommand = TextCommand.Replace("  ", " ");
-                else break;
-            }
-            if (TextCommand.Contains('*') && TextCommand[^1] != '*') // command* param1, param2, param3 ...
-            {
-                TextCommand = TextCommand[0..TextCommand.IndexOf('*')].Replace(" ", "_").ToLower() + TextCommand[TextCommand.IndexOf('*')..];
-                ObjLog.LOGTextAppend($"Text: {TextCommand}");
-                Match Command = Regex.Match(TextCommand, @"\b[^\*~!@#$<>,.\/\\?|'"";:`%^&*()\[\]{} \-=+]+\* ?");
-                string CommandText = Command.Value.ToString().Replace("*", string.Empty).Replace(" ", string.Empty);
-                MatchCollection Parameteres = Regex.Matches(TextCommand, @"( |\*|,)([^,]|,,)+");
-                int Index = MainData.MainCommandData.MassConsoleCommand.Select(i => i.Name).ToList().IndexOf(CommandText);
-                if (Index > -1)
-                {
-                    ConsoleCommand ObjCommand = MainData.MainCommandData.MassConsoleCommand[Index].Copy();
-                    if (ObjCommand.CommandParameters != null)
-                    {
-                        for (int i = 0; i < ObjCommand.CommandParameters.Length; i++)
-                        {
-                            if (i < Parameteres.Count) ObjCommand.CommandParameters[i].Value = Parameteres[i].Value[2..];
-                            else break;
-                        }
-                    }
-                    return ObjCommand;
-                }
-                return ConsoleCommand.NotCommand(CommandText);
-            }
-            else // command
-            {
-                return ConsoleCommand.SearchConsoleCommand(MainData.MainCommandData.MassConsoleCommand,
-                    TextCommand.Replace(" ", "_").Replace("*", string.Empty).ToLower(), false);
-            }
-        }
-
-        /// <summary>
         /// Проверка голосовой команды на распознавание
         /// </summary>
         /// <param name="sender">Объект проверки</param>
@@ -248,7 +205,7 @@ namespace AAC.Classes
             switch (Command.ID)
             {
                 case 1: // закрыть программу
-                    ReadDefaultConsoleCommand("close").ExecuteCommand(false);
+                    ConsoleCommand.ReadDefaultConsoleCommand("close").ExecuteCommand(false);
                     return StateResult.Completed;
                 case 2: // боковая панель
                     App.MainForm.DeveloperPanelClick(null, null);
@@ -257,7 +214,7 @@ namespace AAC.Classes
                     MainData.MainMP3.PlaySound("YesVoice");
                     return StateResult.Completed;
                 case 4: // очистить
-                    ReadDefaultConsoleCommand("clear").ExecuteCommand(false);
+                    ConsoleCommand.ReadDefaultConsoleCommand("clear").ExecuteCommand(false);
                     return StateResult.Completed;
                 case 5: // покажись
                     if (App.MainForm.WindowState != FormWindowState.Normal)

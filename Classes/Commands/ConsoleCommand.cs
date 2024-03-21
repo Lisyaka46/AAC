@@ -9,7 +9,7 @@ using System.ComponentModel;
 using System.Text.RegularExpressions;
 using static AAC.MiniFunctions;
 
-namespace AAC.Classes
+namespace AAC.Classes.Commands
 {
     /// <summary>
     /// Консольная команда
@@ -101,6 +101,50 @@ namespace AAC.Classes
             for (int i = 0; i < AllNameCommand.Length; i++)
                 if (AllNameCommand[i].Equals(TextCommand)) return ArrayConsoleCommand[i].Copy(CopyParam);
             return NotCommand(TextCommand);
+        }
+
+        /// <summary>
+        /// Прочитать команду из консоли
+        /// </summary>
+        /// <param name="TextCommand">Читаемая команда</param>
+        /// <returns>Объект консольной команды</returns>
+        public static ConsoleCommand ReadDefaultConsoleCommand(string TextCommand)
+        {
+            ObjLog.LOGTextAppend($"Начинаю читать команду <{TextCommand}>");
+            while (TextCommand.Length > 0)
+            {
+                if (TextCommand[^1] == ' ') TextCommand = TextCommand.Remove(TextCommand.Length - 1);
+                else if (TextCommand.Contains("  ")) TextCommand = TextCommand.Replace("  ", " ");
+                else break;
+            }
+            if (TextCommand.Contains('*') && TextCommand[^1] != '*') // command* param1, param2, param3 ...
+            {
+                TextCommand = TextCommand[0..TextCommand.IndexOf('*')].Replace(" ", "_").ToLower() + TextCommand[TextCommand.IndexOf('*')..];
+                ObjLog.LOGTextAppend($"Text: {TextCommand}");
+                Match Command = Regex.Match(TextCommand, @"\b[^\*~!@#$<>,.\/\\?|'"";:`%^&*()\[\]{} \-=+]+\* ?");
+                string CommandText = Command.Value.ToString().Replace("*", string.Empty).Replace(" ", string.Empty);
+                MatchCollection Parameteres = Regex.Matches(TextCommand, @"( |\*|,)([^,]|,,)+");
+                int Index = MainData.MainCommandData.MassConsoleCommand.Select(i => i.Name).ToList().IndexOf(CommandText);
+                if (Index > -1)
+                {
+                    ConsoleCommand ObjCommand = MainData.MainCommandData.MassConsoleCommand[Index].Copy();
+                    if (ObjCommand.CommandParameters != null)
+                    {
+                        for (int i = 0; i < ObjCommand.CommandParameters.Length; i++)
+                        {
+                            if (i < Parameteres.Count) ObjCommand.CommandParameters[i].Value = Parameteres[i].Value[2..];
+                            else break;
+                        }
+                    }
+                    return ObjCommand;
+                }
+                return NotCommand(CommandText);
+            }
+            else // command
+            {
+                return ConsoleCommand.SearchConsoleCommand(MainData.MainCommandData.MassConsoleCommand,
+                    TextCommand.Replace(" ", "_").Replace("*", string.Empty).ToLower(), false);
+            }
         }
 
         /// <summary>
@@ -232,7 +276,7 @@ namespace AAC.Classes
                 // emptytrash
                 case 8:
                     ObjLog.LOGTextAppend($"Была вызвана команда очистки корзины");
-                    uint result = DLLMethods.SHEmptyRecycleBin(IntPtr.Zero, null, 0);
+                    uint result = DLLMethods.SHEmptyRecycleBin(nint.Zero, null, 0);
                     animText = new(App.MainForm.tbOutput, ">>> The basket is cleared!\n");
                     animText.AnimInit(true);
                     return StateResult.Completed;

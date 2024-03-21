@@ -1,4 +1,5 @@
 ﻿using AAC.Classes;
+using AAC.Classes.Commands;
 using Microsoft.Speech.Recognition;
 using NAudio.CoreAudioApi;
 using System.Diagnostics;
