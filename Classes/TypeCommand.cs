@@ -54,7 +54,7 @@ namespace AAC.Classes
             /// <summary>
             /// Создать выполнение команды
             /// </summary>
-            public StateResult ExecuteCommand() => ExecuteVoiceCommand(this);
+            public CommandStateResult ExecuteCommand() => ExecuteVoiceCommand(this);
 
             /// <summary>
             /// Поиск голосовой команды по её фразе
@@ -97,62 +97,6 @@ namespace AAC.Classes
         }
 
         /// <summary>
-        /// Объект итогового состояния выполнения команды
-        /// </summary>
-        public class StateResult
-        {
-            /// <summary>
-            /// Итоговое состояние команды
-            /// </summary>
-            public ResultStateCommand State { get; }
-
-            /// <summary>
-            /// Сообщение в LOG
-            /// </summary>
-            public string LOGMassage { get; }
-
-            /// <summary>
-            /// Сообщение в консольную строку
-            /// </summary>
-            public string Massage { get; }
-
-            /// <summary>
-            /// Инициализировать объект итога выполнения команды
-            /// </summary>
-            /// <param name="ResultState">Итоговое состояние выполнения</param>
-            /// <param name="Massage">Сообщение в консольную строку</param>
-            /// <param name="Massage_log">Сообщение в LOG</param>
-            internal StateResult(ResultStateCommand ResultState, string Massage, string Massage_log)
-            {
-                State = ResultState;
-                this.Massage = Massage;
-                LOGMassage = Massage_log;
-            }
-
-            /// <summary>
-            /// Успешный итог выполнения команды
-            /// </summary>
-            public static StateResult Completed => new(ResultStateCommand.Complete, string.Empty, string.Empty);
-
-            /// <summary>
-            /// Выполнить обычные действия подведения итога команды
-            /// </summary>
-            public void Summarize()
-            {
-                if (LOGMassage.Length > 0) ObjLog.LOGTextAppend(LOGMassage);
-                if (State == ResultStateCommand.Failed)
-                {
-                    MainData.MainMP3.PlaySound("Error");
-                    //ConstAnimMove ConstantFormule = new(15, 15, 10);
-                    //ConstantFormule.InitAnimFormule(App.MainForm.tbOutput, //!! Formules.Sinusoid, new ConstAnimMove(App.MainForm.tbOutput.Location.Y), AnimationStyle.XY);
-                }
-                if (Massage.Length > 0) new Instr_AnimText(App.MainForm.tbOutput, Massage).AnimInit(true);
-                if (App.MainForm.WindowState == FormWindowState.Normal) App.MainForm.LComplete_Click(null, null);
-                //else if (MainData.Flags.FormActivity == Data.BooleanFlags.False && State == ResultStateCommand.Complete) MainData.MainMP3.PlaySound("Complete");
-            }
-        }
-
-        /// <summary>
         /// Проверка голосовой команды на распознавание
         /// </summary>
         /// <param name="sender">Объект проверки</param>
@@ -167,7 +111,7 @@ namespace AAC.Classes
                 {
                     if (!Text.Equals("включи голосовые команды"))
                     {
-                        StateResult Result = VoiceCommand.SearchVoiceCommand(MainData.MainCommandData.MassVoiceCommand, Text).ExecuteCommand();
+                        CommandStateResult Result = VoiceCommand.SearchVoiceCommand(MainData.MainCommandData.MassVoiceCommand, Text).ExecuteCommand();
                         ObjLog.LOGTextAppend($"Выполнил голосовую речь: <{e.Result.Text}>");
                         Result.Summarize();
                     }
@@ -178,7 +122,7 @@ namespace AAC.Classes
                     {
                         if (Text.Equals("включи голосовые команды"))
                         {
-                            StateResult Result = VoiceCommand.SearchVoiceCommand(MainData.MainCommandData.MassVoiceCommand, Text).ExecuteCommand();
+                            CommandStateResult Result = VoiceCommand.SearchVoiceCommand(MainData.MainCommandData.MassVoiceCommand, Text).ExecuteCommand();
                             ObjLog.LOGTextAppend($"Выполнил голосовую речь: <{e.Result.Text}>");
                             Result.Summarize();
                         }
@@ -200,51 +144,51 @@ namespace AAC.Classes
         /// </summary>
         /// <param name="Command"></param>
         /// <returns>Вердикт выполнения голосовой команды</returns>
-        private static StateResult ExecuteVoiceCommand(VoiceCommand Command)
+        private static CommandStateResult ExecuteVoiceCommand(VoiceCommand Command)
         {
             switch (Command.ID)
             {
                 case 1: // закрыть программу
                     ConsoleCommand.ReadDefaultConsoleCommand("close").ExecuteCommand(false);
-                    return StateResult.Completed;
+                    return CommandStateResult.Completed;
                 case 2: // боковая панель
                     App.MainForm.DeveloperPanelClick(null, null);
-                    return StateResult.Completed;
+                    return CommandStateResult.Completed;
                 case 3: // ты жив
                     MainData.MainMP3.PlaySound("YesVoice");
-                    return StateResult.Completed;
+                    return CommandStateResult.Completed;
                 case 4: // очистить
                     ConsoleCommand.ReadDefaultConsoleCommand("clear").ExecuteCommand(false);
-                    return StateResult.Completed;
+                    return CommandStateResult.Completed;
                 case 5: // покажись
                     if (App.MainForm.WindowState != FormWindowState.Normal)
                         App.MainForm.UnfoldingApplication(null, null);
-                    return StateResult.Completed;
+                    return CommandStateResult.Completed;
                 case 6: // спрячся
                     App.MainForm.FoldingMoveApplication(null, null);
-                    return StateResult.Completed;
+                    return CommandStateResult.Completed;
                 case 7: // открой рабочую директорию
                     Process.Start("explorer.exe", Directory.GetCurrentDirectory());
-                    return StateResult.Completed;
+                    return CommandStateResult.Completed;
                 case 8: // сверни всё
                     App.MainForm.Show();
                     ShellGUID("DesktopVisualTrue");
-                    return StateResult.Completed;
+                    return CommandStateResult.Completed;
                 case 9: // открой панель управления
                     ShellGUID("CommandPanelWin");
-                    return StateResult.Completed;
+                    return CommandStateResult.Completed;
                 case 10: // протестируй
-                    return StateResult.Completed;
+                    return CommandStateResult.Completed;
                 case 11: // заблокируй компьютер
                     if (!DLLMethods.LockWorkStation())
                         throw new Win32Exception(Marshal.GetLastWin32Error());
-                    return StateResult.Completed;
+                    return CommandStateResult.Completed;
                 case 12: // выключи голосовые команды
                     App.MainForm.pbVoiceButton.Image = Image.FromFile(@"Data\Image\Micro\MicroSleepingNotMouse.png");
                     MainData.Flags.AudioCommand = Data.StatusFlags.Sleep;
                     if (App.MainForm.WindowState != FormWindowState.Normal)
                         MainData.MainMP3.PlaySound("Complete");
-                    return StateResult.Completed;
+                    return CommandStateResult.Completed;
                 case 13: // закрой окно информации
                     if (App.InformationCommand.Visible)
                     {
@@ -252,16 +196,16 @@ namespace AAC.Classes
                         if (App.MainForm.WindowState != FormWindowState.Normal)
                             MainData.MainMP3.PlaySound("Complete");
                     }
-                    return StateResult.Completed;
+                    return CommandStateResult.Completed;
                 case 14: // сколько времени
                     TimeTempus();
-                    return StateResult.Completed;
+                    return CommandStateResult.Completed;
                 case 15:
                     App.MainForm.pbVoiceButton.Image = Image.FromFile(@"Data\Image\Micro\MicroActivateNotMouse.png");
                     MainData.Flags.AudioCommand = Data.StatusFlags.Active;
-                    return StateResult.Completed;
+                    return CommandStateResult.Completed;
             }
-            return new StateResult(ResultStateCommand.Failed,
+            return new CommandStateResult(ResultStateCommand.Failed,
                 $">>> Voice command ID: {Command.ID} is Invalid",
                 $"Голосовая команда ID: {Command.ID} не нраспознана");
         }

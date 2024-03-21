@@ -87,7 +87,7 @@ namespace AAC.GUI
                 try { Process.Start(new ProcessStartInfo(InfoLabel.Text) { UseShellExecute = true }); }
                 catch
                 {
-                    new TypeCommand.StateResult(TypeCommand.ResultStateCommand.Failed,
+                    new CommandStateResult(TypeCommand.ResultStateCommand.Failed,
                         $"Failed activate link \"{InfoLabel.Text}\"", $"Не удалось открыть ссылку {InfoLabel.Text}").Summarize();
                 }
             }

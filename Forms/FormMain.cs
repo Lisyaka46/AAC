@@ -1454,7 +1454,7 @@ namespace AAC
         /// <param name="e">Событие</param>
         public void ActivateConsoleCommand(object sender, EventArgs e)
         {
-            TypeCommand.StateResult Result;
+            CommandStateResult Result;
             string text = (tbInput.Text ?? string.Empty).Replace("\r", string.Empty).Replace("\n", string.Empty);
             if (tbInput.Size.Width > 322) TbInputChangeLineText();
             PAC_Buffer.AddNewElement(text);

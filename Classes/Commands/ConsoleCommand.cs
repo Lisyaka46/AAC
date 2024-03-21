@@ -14,7 +14,7 @@ namespace AAC.Classes.Commands
     /// <summary>
     /// Консольная команда
     /// </summary>
-    public partial class ConsoleCommand
+    public class ConsoleCommand
     {
         /// <summary>
         /// Имя команды
@@ -151,7 +151,7 @@ namespace AAC.Classes.Commands
         /// Создать выполнение команды
         /// </summary>
         /// <param name="InputConsole">Была введена ли эта команда или нет</param>
-        public StateResult ExecuteCommand(bool InputConsole)
+        public CommandStateResult ExecuteCommand(bool InputConsole)
         {
             Instr_AnimText animText;
             if (InputConsole) App.MainForm.tbInput.Text = string.Empty;
@@ -169,14 +169,14 @@ namespace AAC.Classes.Commands
                 // settings
                 case 1:
                     App.MainForm.BSettings_Click(null, null);
-                    return StateResult.Completed;
+                    return CommandStateResult.Completed;
 
                 // clear
                 case 2:
                     ObjLog.LOGTextAppend($"Была распознана очистка консоли <tbOutput> (Командой clear)");
                     AnimationDL.StopAnimate(AnimationDL.StyleAnimateObj.AnimText, "tbOutput");
                     App.MainForm.tbOutput.Text = string.Empty;
-                    return StateResult.Completed;
+                    return CommandStateResult.Completed;
 
                 // print
                 case 3:
@@ -189,12 +189,12 @@ namespace AAC.Classes.Commands
                     //App.MainForm.BCloseMainApplication(null, null);
                     //Thread.Sleep(75);
                     Application.Restart();
-                    return StateResult.Completed;
+                    return CommandStateResult.Completed;
 
                 // close
                 case 5:
                     Environment.Exit(0);
-                    return StateResult.Completed;
+                    return CommandStateResult.Completed;
 
                 // close_process
                 case 6:
@@ -249,7 +249,7 @@ namespace AAC.Classes.Commands
                             }
                             else
                             {
-                                return new StateResult(ResultStateCommand.Failed,
+                                return new CommandStateResult(ResultStateCommand.Failed,
                                 $">>> ~Execution is blocked closed <{Name}.exe>\n",
                                 "Было вызвано исключение об невозможном закрытии процесса так как он явзяется СИСТЕМНЫМ");
                             }
@@ -258,7 +258,7 @@ namespace AAC.Classes.Commands
                     else
                         return new(ResultStateCommand.Failed, "There are not enough parameters to execute the command",
                             $"Недостаточно параметров для выполнения команды {Name}");
-                    return StateResult.Completed;
+                    return CommandStateResult.Completed;
 
                 // cmd
                 case 7:
@@ -271,7 +271,7 @@ namespace AAC.Classes.Commands
                             else break;
                         }
                     }
-                    return StateResult.Completed;
+                    return CommandStateResult.Completed;
 
                 // emptytrash
                 case 8:
@@ -279,26 +279,26 @@ namespace AAC.Classes.Commands
                     uint result = DLLMethods.SHEmptyRecycleBin(nint.Zero, null, 0);
                     animText = new(App.MainForm.tbOutput, ">>> The basket is cleared!\n");
                     animText.AnimInit(true);
-                    return StateResult.Completed;
+                    return CommandStateResult.Completed;
 
                 //
                 case 9:
-                    return StateResult.Completed;
+                    return CommandStateResult.Completed;
 
                 //
                 case 10:
-                    return StateResult.Completed;
+                    return CommandStateResult.Completed;
 
                 // font_size
                 case 11:
                     if (CommandParameters != null)
                     {
                         if (Stringint(CommandParameters[0].Value))
-                            return new StateResult(ResultStateCommand.Failed,
+                            return new CommandStateResult(ResultStateCommand.Failed,
                                 $">>> Failed. font size is not number: {CommandParameters[0].Value}\n",
                                 "Была вызвана ошибка команды <font_size> что введено было не число");
                         else if (Convert.ToInt32(CommandParameters[0].Value) < 7 || Convert.ToInt32(CommandParameters[0].Value) > 40)
-                            return new StateResult(ResultStateCommand.Failed,
+                            return new CommandStateResult(ResultStateCommand.Failed,
                                 $">>> Failed. font size range 7 - 40: {CommandParameters[0].Value}\n",
                                 "Была вызвана ошибка команды <font_size> об несоответствии параметра диапазону значений");
                         else
@@ -311,7 +311,7 @@ namespace AAC.Classes.Commands
                     else
                         return new(ResultStateCommand.Failed, "There are not enough parameters to execute the command",
                             $"Недостаточно параметров для выполнения команды {Name}");
-                    return StateResult.Completed;
+                    return CommandStateResult.Completed;
 
                 // open_link
                 case 12:
@@ -330,14 +330,14 @@ namespace AAC.Classes.Commands
                         }
                         catch
                         {
-                            return new StateResult(ResultStateCommand.Failed,
+                            return new CommandStateResult(ResultStateCommand.Failed,
                                 $"Failed activate link \"{CommandParameters[0].Value}\"", $"Не удалось открыть ссылку {CommandParameters[0].Value}");
                         }
                     }
                     else
                         return new(ResultStateCommand.Failed, "There are not enough parameters to execute the command",
                             $"Недостаточно параметров для выполнения команды {Name}");
-                    return StateResult.Completed;
+                    return CommandStateResult.Completed;
 
                 // open_directory
                 case 13:
@@ -347,7 +347,7 @@ namespace AAC.Classes.Commands
                         if (Directory.Exists(CommandParameters[0].Value))
                             Process.Start("explorer.exe", CommandParameters[0].Value);
                         else
-                            return new StateResult(ResultStateCommand.Failed,
+                            return new CommandStateResult(ResultStateCommand.Failed,
                                 $">>> Failed. Inknown path name: {CommandParameters[0].Value}\n", "Было вызвано исключение из-за неизвестной директории");
                     }
                     else
@@ -358,7 +358,7 @@ namespace AAC.Classes.Commands
                             $">>> Opening a directory: {(CommandParameters == null ? "MAIN" : CommandParameters[0].Value)}...\n");
                         animText.AnimInit(true);
                     }
-                    return StateResult.Completed;
+                    return CommandStateResult.Completed;
 
                 // open_file
                 case 14:
@@ -377,12 +377,12 @@ namespace AAC.Classes.Commands
                             }
                             catch
                             {
-                                return new StateResult(ResultStateCommand.Failed,
+                                return new CommandStateResult(ResultStateCommand.Failed,
                                     ">>> Failed. There is no opening program for the file..\n", "Было вызвано исключение из-за неизвестной программе открывающей файл");
                             }
                         }
                         else
-                            return new StateResult(ResultStateCommand.Failed,
+                            return new CommandStateResult(ResultStateCommand.Failed,
                                 $">>> Failed. Inknown path or file: {CommandParameters[0].Value}\n",
                                 "Было вызвано исключение об отсутствии файла по данной директории");
                     }
@@ -412,14 +412,14 @@ namespace AAC.Classes.Commands
                             animText.AnimInit(true);
                         }
                         else
-                            return new StateResult(ResultStateCommand.Failed,
+                            return new CommandStateResult(ResultStateCommand.Failed,
                                 $"Было вызвано исключение об отсутствии директории для ярлыка <{CommandParameters[1].Value}>",
                                 $">>> Failed. <{CommandParameters[1].Value}> not is directory\n");
                     }
                     else
                         return new(ResultStateCommand.Failed, "There are not enough parameters to execute the command",
                             $"Недостаточно параметров для выполнения команды {Name}");
-                    return StateResult.Completed;
+                    return CommandStateResult.Completed;
 
                 // help
                 case 16:
@@ -435,7 +435,7 @@ namespace AAC.Classes.Commands
                         ObjLog.LOGTextAppend($"Форма пояснения всех команд открыта с ошибкой: <Во избежании была создана новая форма>");
                     }
                     App.MainForm.FoldingApplication(null, null);
-                    return StateResult.Completed;
+                    return CommandStateResult.Completed;
 
                 // windows_bat
                 case 17:
@@ -450,14 +450,14 @@ namespace AAC.Classes.Commands
                             Process.Start($"{Directory.GetCurrentDirectory()}\\Data\\Bat\\{CommandParameters[0].Value}.bat");
                         }
                         else
-                            return new StateResult(ResultStateCommand.Failed,
+                            return new CommandStateResult(ResultStateCommand.Failed,
                                 $">>> Failed. <{CommandParameters[0].Value}> not is directory: BAT.FILE\n",
                                 $"Было вызвано исключение об отсутствии <{CommandParameters[0].Value}.bat> в директории BAT.FILE");
                     }
                     else
                         return new(ResultStateCommand.Failed, "There are not enough parameters to execute the command",
                             $"Недостаточно параметров для выполнения команды {Name}");
-                    return StateResult.Completed;
+                    return CommandStateResult.Completed;
 
                 // test
                 case 18:
@@ -477,18 +477,18 @@ namespace AAC.Classes.Commands
                     }
                     else
                     {
-                        return new StateResult(ResultStateCommand.Failed,
+                        return new CommandStateResult(ResultStateCommand.Failed,
                             ">>> Access denied due to security settings\n", "Было вызвано исключение об малых правах пользователя перед разработчиком");
                     }
-                    return StateResult.Completed;
+                    return CommandStateResult.Completed;
 
                 //
                 case 19:
-                    return StateResult.Completed;
+                    return CommandStateResult.Completed;
 
                 //
                 case 20:
-                    return StateResult.Completed;
+                    return CommandStateResult.Completed;
 
                 // log
                 case 21:
@@ -505,7 +505,7 @@ namespace AAC.Classes.Commands
                     }
                     App.Log.Show();
                     App.Log.WindowState = FormWindowState.Normal;
-                    return StateResult.Completed;
+                    return CommandStateResult.Completed;
 
                 // save_log
                 case 22:
@@ -515,7 +515,7 @@ namespace AAC.Classes.Commands
                     animText.AnimInit(true);
                     file_write.Write(ObjLog.MassLogElements.Select(i => i.Text).ToArray());
                     file_write.Close();
-                    return StateResult.Completed;
+                    return CommandStateResult.Completed;
 
                 // delete_log
                 case 23:
@@ -538,7 +538,7 @@ namespace AAC.Classes.Commands
                             }
                         }
                         else
-                            return new StateResult(ResultStateCommand.Failed,
+                            return new CommandStateResult(ResultStateCommand.Failed,
                                 $">>> Failed. Inknown file: Data\\Log\\{CommandParameters[0].Value}.txt\n", "Было вызвано исключение из-за неизвестного файла");
                     }
                     else
@@ -556,7 +556,7 @@ namespace AAC.Classes.Commands
                             animText.AnimInit(true);
                         }
                     }
-                    return StateResult.Completed;
+                    return CommandStateResult.Completed;
 
                 // pythagorean_three
                 case 24:
@@ -576,14 +576,14 @@ namespace AAC.Classes.Commands
                         else
                         {
                             int InvalidIndex = !Stringint(CommandParameters[0].Value) ? 1 : 0;
-                            return new StateResult(ResultStateCommand.Failed,
+                            return new CommandStateResult(ResultStateCommand.Failed,
                                     $">>> Failed. The parameter #{InvalidIndex} is not a number: {CommandParameters[InvalidIndex].Value}\n",
                                     "Было вызвано исключение из-за не цифрового параметра");
                         }
                     }
                     else return new(ResultStateCommand.Failed, "There are not enough parameters to execute the command",
                     $"Недостаточно параметров для выполнения команды {Name}");
-                    return StateResult.Completed;
+                    return CommandStateResult.Completed;
 
                 // colored
                 case 25:
@@ -594,18 +594,18 @@ namespace AAC.Classes.Commands
                     }
                     catch { App.Settings.ThemesCreated = new(); }
                     App.Settings.ThemesCreated.Show();
-                    return StateResult.Completed;
+                    return CommandStateResult.Completed;
 
                 // new_label
                 case 26:
                     App.MainForm.GenerateLabel();
-                    return StateResult.Completed;
+                    return CommandStateResult.Completed;
 
                 // NOT COMMAND
                 default:
                     string TextLOG = "Команда не распозналась и вызвала исключение об ошибке";
-                    if (Name.Length > 0) return new StateResult(ResultStateCommand.Failed, $">>> ~Invalid Command: \"{Name}\"\n", TextLOG);
-                    else return new StateResult(ResultStateCommand.Failed, $">>> ~Invalid NULL Command\n", TextLOG);
+                    if (Name.Length > 0) return new CommandStateResult(ResultStateCommand.Failed, $">>> ~Invalid Command: \"{Name}\"\n", TextLOG);
+                    else return new CommandStateResult(ResultStateCommand.Failed, $">>> ~Invalid NULL Command\n", TextLOG);
             };
         }
     }
