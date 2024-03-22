@@ -67,7 +67,7 @@ namespace AAC.GUI
                     Label label = GenerateLabel.Invoke(Parent, Text, Elements.Count);
                     label.MouseEnter += (sender, e) => label.BackColor = ColorWhile.SetOffsetColor(label.BackColor, 30);
                     label.MouseLeave += (sender, e) => label.BackColor = ColorWhile.SetOffsetColor(label.BackColor, -30);
-                    label.Click += (sender, e) => ConsoleCommand.ReadDefaultConsoleCommand(label.Text).ExecuteCommand(false).Summarize();
+                    label.Click += (sender, e) => ConsoleCommand.ReadConsoleCommand(label.Text);
                     Elements.Add(label);
                 }
                 else

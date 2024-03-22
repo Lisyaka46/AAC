@@ -4,6 +4,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using static AAC.Forms_Functions;
 using AAC.Classes;
+using static AAC.Classes.AnimationDL.Animate.AnimFormule;
 
 namespace AAC
 {
@@ -188,7 +189,17 @@ namespace AAC
                 App.Starting.Opacity = 0d;
                 App.Starting.Close();
                 ObjLog.LOGTextAppend("Программа активируется");
-                StartingProgramm();
+
+                Task.Run(App.MainForm.AlwaysUpdateWindow);
+                MainData.AllSpecialColor.RGB.StartUpdate();
+                MainData.AllSpecialColor.RGBCC.StartUpdate();
+                MainData.AllSpecialColor.SC.StartUpdate();
+                App.MainForm.CapsLock_Info.Image = Control.IsKeyLocked(Keys.CapsLock) ?
+                        Image.FromFile(@"Data\Image\Up-A.gif") : Image.FromFile(@"Data\Image\Down-a.gif");
+                App.MainForm.LActiveitedSoftCommand_Click(null, null);
+                ConstAnimMove ConstantFormule = new(App.MainForm.pICON.Location.X, 15, 8);
+                ConstantFormule.InitAnimFormule(App.MainForm.pICON, Formules.QuickTransition, new ConstAnimMove(App.MainForm.pICON.Location.Y), AnimationStyle.XY);
+
                 App.MainForm.Opacity = 0d;
                 Application.Run(App.MainForm);
             }

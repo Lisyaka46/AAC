@@ -78,8 +78,7 @@ namespace AAC.GUI
         {
             if (InfoLabel.Action == InfoLabelAccess.TypeActionLabel.InitializeCommand)
             {
-                ConsoleCommand Command = ConsoleCommand.ReadDefaultConsoleCommand(InfoLabel.Text);
-                Command.ExecuteCommand(false).Summarize();
+                ConsoleCommand.ReadConsoleCommand(InfoLabel.Text);
             }
             else if (InfoLabel.Action == InfoLabelAccess.TypeActionLabel.OpenDirectoryElement) Process.Start("explorer.exe", InfoLabel.Text);
             else if (InfoLabel.Action == InfoLabelAccess.TypeActionLabel.OpenLinkBrower)
@@ -87,7 +86,7 @@ namespace AAC.GUI
                 try { Process.Start(new ProcessStartInfo(InfoLabel.Text) { UseShellExecute = true }); }
                 catch
                 {
-                    new CommandStateResult(ResultStateCommand.Failed,
+                    new CommandStateResult(ResultState.Failed,
                         $"Failed activate link \"{InfoLabel.Text}\"", $"Не удалось открыть ссылку {InfoLabel.Text}").Summarize();
                 }
             }

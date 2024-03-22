@@ -6,7 +6,7 @@ namespace AAC.Classes.Commands
     /// <summary>
     /// Конечные результаты выполнения команды
     /// </summary>
-    public enum ResultStateCommand
+    public enum ResultState
     {
         /// <summary>
         /// Команда не выполнилась
@@ -27,7 +27,7 @@ namespace AAC.Classes.Commands
         /// <summary>
         /// Итоговое состояние команды
         /// </summary>
-        public readonly ResultStateCommand State;
+        public readonly ResultState State;
 
         /// <summary>
         /// Сообщение в LOG
@@ -42,7 +42,7 @@ namespace AAC.Classes.Commands
         /// <summary>
         /// Успешный итог выполнения команды
         /// </summary>
-        public static CommandStateResult Completed => new(ResultStateCommand.Complete, string.Empty, string.Empty);
+        public static CommandStateResult Completed => new(ResultState.Complete, string.Empty, string.Empty);
 
         /// <summary>
         /// Инициализировать объект итога выполнения команды
@@ -50,7 +50,7 @@ namespace AAC.Classes.Commands
         /// <param name="ResultState">Итоговое состояние выполнения</param>
         /// <param name="Massage">Сообщение в консольную строку</param>
         /// <param name="Massage_log">Сообщение в LOG</param>
-        internal CommandStateResult(ResultStateCommand ResultState, string Massage, string Massage_log)
+        internal CommandStateResult(ResultState ResultState, string Massage, string Massage_log)
         {
             State = ResultState;
             this.Massage = Massage;
@@ -63,7 +63,7 @@ namespace AAC.Classes.Commands
         public void Summarize()
         {
             if (LOGMassage.Length > 0) ObjLog.LOGTextAppend(LOGMassage);
-            if (State == ResultStateCommand.Failed)
+            if (State == ResultState.Failed)
             {
                 MainData.MainMP3.PlaySound("Error");
                 //ConstAnimMove ConstantFormule = new(15, 15, 10);

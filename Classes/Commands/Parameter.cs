@@ -13,8 +13,8 @@ namespace AAC.Classes.Commands
     /// Инициализировать объект параметра команды
     /// </remarks>
     /// <param name="NameParameter">Имя параметра</param>
-    /// <param name="value">Значение параметра</param>
-    public class Parameter(string NameParameter, string value)
+    /// <param name="AbsolutlyParameter">Обязателен или не обязателен</param>
+    public class Parameter(string NameParameter, bool AbsolutlyParameter)
     {
         /// <summary>
         /// Имя параметра команды
@@ -24,6 +24,6 @@ namespace AAC.Classes.Commands
         /// <summary>
         /// Значение параметра команды
         /// </summary>
-        public string Value { get; set; } = value;
+        public readonly bool Absolutly = AbsolutlyParameter;
     }
 }

@@ -20,12 +20,17 @@ namespace AAC.Classes.Commands
         /// <summary>
         /// ID индификатор команды
         /// </summary>
-        public int ID { get; }
+        public readonly int ID;
 
         /// <summary>
         /// Описание голосовой команды
         /// </summary>
-        public string ExplanationCommand { get; }
+        public readonly string ExplanationCommand;
+
+        /// <summary>
+        /// Пустой объект голосовой команды
+        /// </summary>
+        public static VoiceCommand Empty => new([], -1, null);
 
         /// <summary>
         /// Инициализировать объект голосовой команды
@@ -57,11 +62,6 @@ namespace AAC.Classes.Commands
                 if (PhraseAllVoiceCommand[i].Contains(Phrase)) return ArrayVoiceCommand[i];
             return Empty;
         }
-
-        /// <summary>
-        /// Пустой объект голосовой команды
-        /// </summary>
-        public static VoiceCommand Empty => new([], -1, null);
 
         /// <summary>
         /// Проверка голосовой команды на распознавание
@@ -103,7 +103,7 @@ namespace AAC.Classes.Commands
             switch (ID)
             {
                 case 1: // закрыть программу
-                    ConsoleCommand.ReadDefaultConsoleCommand("close").ExecuteCommand(false);
+                    ConsoleCommand.ReadConsoleCommand("close");
                     return CommandStateResult.Completed;
                 case 2: // боковая панель
                     App.MainForm.DeveloperPanelClick(null, null);
@@ -112,7 +112,7 @@ namespace AAC.Classes.Commands
                     MainData.MainMP3.PlaySound("YesVoice");
                     return CommandStateResult.Completed;
                 case 4: // очистить
-                    ConsoleCommand.ReadDefaultConsoleCommand("clear").ExecuteCommand(false);
+                    ConsoleCommand.ReadConsoleCommand("clear");
                     return CommandStateResult.Completed;
                 case 5: // покажись
                     if (App.MainForm.WindowState != FormWindowState.Normal)
@@ -185,7 +185,7 @@ namespace ConsoleApplication5
                     MainData.Flags.AudioCommand = StatusFlags.Active;
                     return CommandStateResult.Completed;
             }
-            return new CommandStateResult(ResultStateCommand.Failed,
+            return new CommandStateResult(ResultState.Failed,
                 $">>> Voice command ID: {ID} is Invalid",
                 $"Голосовая команда ID: {ID} не нраспознана");
         }

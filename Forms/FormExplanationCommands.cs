@@ -38,8 +38,8 @@ namespace AAC
                 Position = 0;
                 if (State == StateDescriptionInfo.DefaultCommand)
                 {
-                    MassCommand = MainData.MainCommandData.MassConsoleCommand.Select(i => i.Name).ToArray();
-                    MassExplanationCommand = MainData.MainCommandData.MassConsoleCommand.Select(i => i.ExplanationCommand).ToArray();
+                    MassCommand = MainData.MainCommandData.MassConsoleCommand.Select(i => i.WritingCommandName()).ToArray();
+                    MassExplanationCommand = MainData.MainCommandData.MassConsoleCommand.Select(i => i.Explanation).ToArray();
                 }
                 else if (State == StateDescriptionInfo.VoiceCommand)
                 {
@@ -102,8 +102,8 @@ namespace AAC
                     cbCommands.Text = cbCommands.Items[ObjInfo.Position].ToString();
                     lPositionInformationCommand.Text = $"{ObjInfo.Position + 1}/{ObjInfo.MassCommand.Length}";
                     lExplanation.Text = $"<System command>\n{ObjInfo.MassExplanationCommand[ObjInfo.Position]}";
-                    INameCommand.Text = $"{ObjInfo.Position + 1}. {MainData.MainCommandData.MassConsoleCommand[ObjInfo.Position].GenRegTeamNameCommand()}";
-                    lExampleWriteCommand.Text = MainData.MainCommandData.MassConsoleCommand[ObjInfo.Position].GenRegTeamAllCommand();
+                    INameCommand.Text = $"{ObjInfo.Position + 1}. {MainData.MainCommandData.MassConsoleCommand[ObjInfo.Position].WritingCommandName()}";
+                    lExampleWriteCommand.Text = MainData.MainCommandData.MassConsoleCommand[ObjInfo.Position].WritingCommandAll();
                     break;
                 case StateDescriptionInfo.VoiceCommand:
                     cbCommands.Text = cbCommands.Items[ObjInfo.Position].ToString();

@@ -265,7 +265,7 @@ namespace AAC
             bRebootApplication.MouseClick += (sender, e) =>
             {
                 lInformationCursor.Hide();
-                ConsoleCommand.ReadDefaultConsoleCommand("reboot").ExecuteCommand(false);
+                ConsoleCommand.ReadConsoleCommand("reboot");
             };
             bRebootApplication.MouseHover += (sender, e) => ActivateLabelInfo("Перезагружает программу");
             bRebootApplication.MouseLeave += (sender, e) => DisactivateLabelInfo();
@@ -283,7 +283,7 @@ namespace AAC
             PAC_bColoredTheme.ActivateButton += (KeyActivity) =>
             {
                 PAC_Disactivate();
-                ConsoleCommand.ReadDefaultConsoleCommand("colored").ExecuteCommand(false);
+                ConsoleCommand.ReadConsoleCommand("colored");
             };
 
             // Кнопка в PAC "Изменить цвет текста"
@@ -297,14 +297,14 @@ namespace AAC
             PAC_bClearConsole.ActivateButton += (KeyActivity) =>
             {
                 PAC_Disactivate();
-                ConsoleCommand.ReadDefaultConsoleCommand("clear").ExecuteCommand(false);
+                ConsoleCommand.ReadConsoleCommand("clear");
             };
 
             // Кнопка в PAC "Журнал сообщений"
             PAC_bLogMessage.ActivateButton += (KeyActivity) =>
             {
                 PAC_Disactivate();
-                ConsoleCommand.ReadDefaultConsoleCommand("log").ExecuteCommand(false);
+                ConsoleCommand.ReadConsoleCommand("log");
             };
 
             //
@@ -736,49 +736,46 @@ namespace AAC
 
             int MaxWigth = 0;
             string RegularString = Regex.Escape(tbInput.Text.Replace(' ', '_'));
-            Match match;
-            for (int i = 0; i < MainData.MainCommandData.MassConsoleCommand.Length; i++)
+            string[] HitCommandText = [.. MainData.MainCommandData.MassConsoleCommand.Select((i) => { return i.WritingCommandName(); })];
+            HitCommandText = [.. HitCommandText.Where((i) => { return i.Contains(RegularString, StringComparison.CurrentCultureIgnoreCase); })];
+            for (int i = 0; i < HitCommandText.Length; i++)
             {
-                match = Regex.Match(MainData.MainCommandData.MassConsoleCommand[i].Name, @$"\b{RegularString}.*");
-                if (match.Value.Length > 0)
+                lock (this)
                 {
-                    lock (this)
+                    Color MP = MainData.MainThemeData.ActivateTheme.ObjColors[8].ElColor;
+                    Label Hit = new()
                     {
-                        Color MP = MainData.MainThemeData.ActivateTheme.ObjColors[8].ElColor;
-                        Label Hit = new()
-                        {
-                            Parent = pHitCommandConsole,
-                            Location = new(3, HitCommandConsole.Count == 0 ? 2 : (HitCommandConsole.Count * 18) + 2),
-                            AutoSize = true,
-                            Text = $"{HitCommandConsole.Count + 1}. {match.Value}",
-                            Font = new(Font, FontStyle.Bold),
-                            Tag = match.Value,
-                            ForeColor = Color.White,
-                            BackColor = Color.FromArgb(MP.R + (MP.R <= 150 ? 55 : -55), MP.G + (MP.G <= 150 ? 55 : -55), MP.B + (MP.B <= 150 ? 55 : -55)),
-                        };
-                        Hit.Click += (sender, e) =>
-                        {
-                            tbInput.Text = Hit.Tag.ToString() ?? string.Empty;
-                            tbInput.SelectionStart = tbInput.TextLength;
-                            HitPanelDiactivate();
-                        };
-                        Hit.MouseEnter += (sender, e) =>
-                        {
-                            Hit.BackColor = Color.FromArgb(
-                                Hit.BackColor.R + (Hit.BackColor.R <= 150 ? 55 : -55),
-                                Hit.BackColor.G + (Hit.BackColor.G <= 150 ? 55 : -55),
-                                Hit.BackColor.B + (Hit.BackColor.B <= 150 ? 55 : -55));
-                        };
-                        Hit.MouseLeave += (sender, e) =>
-                        {
-                            Hit.BackColor = Color.FromArgb(
-                                MP.R + (MP.R <= 150 ? 55 : -55),
-                                MP.G + (MP.G <= 150 ? 55 : -55),
-                                MP.B + (MP.B <= 150 ? 55 : -55));
-                        };
-                        HitCommandConsole.Add(Hit);
-                        if (HitCommandConsole[^1].Size.Width > MaxWigth) MaxWigth = HitCommandConsole[^1].Size.Width;
-                    }
+                        Parent = pHitCommandConsole,
+                        Location = new(3, HitCommandConsole.Count == 0 ? 2 : (HitCommandConsole.Count * 18) + 2),
+                        AutoSize = true,
+                        Text = $"{HitCommandConsole.Count + 1}. {HitCommandText[i]}",
+                        Font = new(Font, FontStyle.Bold),
+                        Tag = HitCommandText[i],
+                        ForeColor = Color.White,
+                        BackColor = Color.FromArgb(MP.R + (MP.R <= 150 ? 55 : -55), MP.G + (MP.G <= 150 ? 55 : -55), MP.B + (MP.B <= 150 ? 55 : -55)),
+                    };
+                    Hit.Click += (sender, e) =>
+                    {
+                        tbInput.Text = Hit.Tag.ToString() ?? string.Empty;
+                        tbInput.SelectionStart = tbInput.TextLength;
+                        HitPanelDiactivate();
+                    };
+                    Hit.MouseEnter += (sender, e) =>
+                    {
+                        Hit.BackColor = Color.FromArgb(
+                            Hit.BackColor.R + (Hit.BackColor.R <= 150 ? 55 : -55),
+                            Hit.BackColor.G + (Hit.BackColor.G <= 150 ? 55 : -55),
+                            Hit.BackColor.B + (Hit.BackColor.B <= 150 ? 55 : -55));
+                    };
+                    Hit.MouseLeave += (sender, e) =>
+                    {
+                        Hit.BackColor = Color.FromArgb(
+                            MP.R + (MP.R <= 150 ? 55 : -55),
+                            MP.G + (MP.G <= 150 ? 55 : -55),
+                            MP.B + (MP.B <= 150 ? 55 : -55));
+                    };
+                    HitCommandConsole.Add(Hit);
+                    if (HitCommandConsole[^1].Size.Width > MaxWigth) MaxWigth = HitCommandConsole[^1].Size.Width;
                 }
             }
             if (HitCommandConsole.Count > 0) HitPanelActivate(MaxWigth);
@@ -944,7 +941,7 @@ namespace AAC
         private void BWhatInformation_MouseClick(object sender, MouseEventArgs e)
         {
             BWhatInformation_MouseLeave(null, null);
-            ConsoleCommand.ReadDefaultConsoleCommand("help").ExecuteCommand(false);
+            ConsoleCommand.ReadConsoleCommand("help");
         }
 
         private void UpperPanelActivate(object sender, EventArgs e)
@@ -1445,7 +1442,7 @@ namespace AAC
             lDeveloper_SAW.Text = $"SAW: <{StateAnimWindow}>";
         }
 
-        private void ActivateLOG(object sender, EventArgs e) => ConsoleCommand.ReadDefaultConsoleCommand("log").ExecuteCommand(false);
+        private void ActivateLOG(object sender, EventArgs e) => ConsoleCommand.ReadConsoleCommand("log");
 
         /// <summary>
         /// Активация команды через консоль
@@ -1454,13 +1451,10 @@ namespace AAC
         /// <param name="e">Событие</param>
         public void ActivateConsoleCommand(object sender, EventArgs e)
         {
-            CommandStateResult Result;
             string text = (tbInput.Text ?? string.Empty).Replace("\r", string.Empty).Replace("\n", string.Empty);
             if (tbInput.Size.Width > 322) TbInputChangeLineText();
             PAC_Buffer.AddNewElement(text);
-            Result = ConsoleCommand.ReadDefaultConsoleCommand(text).ExecuteCommand(true);
-            UpdateDeveloperLabel(lDeveloper_StyleCommand, Result.State.ToString());
-            Result.Summarize();
+            ConsoleCommand.ReadConsoleCommand(text, tbInput);
         }
 
         /// <summary>
@@ -1487,13 +1481,6 @@ namespace AAC
         /// Выключить буфер команд в консоли
         /// </summary>
         public void DiactivateConsoleBuffer() => ConsoleBufferAnimate(false);
-
-        public static void UpdateDeveloperLabel(Label DeveloperLabel, string TextUpdate)
-        {
-            if (DeveloperLabel.Tag != null)
-                DeveloperLabel.Text = DeveloperLabel.Tag.ToString()?.Replace("?", TextUpdate);
-            else DeveloperLabel.Text = TextUpdate;
-        }
 
         /// <summary>
         /// Обновляет информацию в аудио мини-панели настроек
