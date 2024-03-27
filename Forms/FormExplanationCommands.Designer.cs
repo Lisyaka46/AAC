@@ -33,7 +33,6 @@
             bDefaultCommand = new Button();
             bAllVoiceCommand = new Button();
             bSoftCommand = new Button();
-            pictureBox1 = new PictureBox();
             lExplanation = new Label();
             lInfoComplete = new Label();
             bListUp = new Button();
@@ -41,24 +40,26 @@
             lPositionInformationCommand = new Label();
             bCopyCommand = new Button();
             tbSearch = new TextBox();
-            lSearchText = new Label();
             cbCommands = new ComboBox();
             bSearch = new Button();
             bItemUpdate = new Button();
             lExampleWriteCommand = new Label();
-            ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
+            lbSeachCommands = new ListBox();
+            bClearSearch = new Button();
+            lNameSearch = new Label();
             SuspendLayout();
             // 
             // INameCommand
             // 
+            INameCommand.AutoEllipsis = true;
             INameCommand.BackColor = Color.Black;
-            INameCommand.BorderStyle = BorderStyle.Fixed3D;
-            INameCommand.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            INameCommand.BorderStyle = BorderStyle.FixedSingle;
+            INameCommand.Font = new Font("Arial", 9.75F, FontStyle.Bold, GraphicsUnit.Point, 204);
             INameCommand.ForeColor = Color.LightGreen;
-            INameCommand.Location = new Point(4, 83);
+            INameCommand.Location = new Point(4, 61);
             INameCommand.Margin = new Padding(4, 0, 4, 0);
             INameCommand.Name = "INameCommand";
-            INameCommand.Size = new Size(792, 37);
+            INameCommand.Size = new Size(191, 24);
             INameCommand.TabIndex = 0;
             INameCommand.Text = "Command";
             INameCommand.TextAlign = ContentAlignment.MiddleLeft;
@@ -67,15 +68,15 @@
             // 
             bDefaultCommand.BackColor = Color.Black;
             bDefaultCommand.Cursor = Cursors.Hand;
+            bDefaultCommand.Font = new Font("Arial", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 204);
             bDefaultCommand.ForeColor = Color.DarkGray;
-            bDefaultCommand.Location = new Point(5, 10);
+            bDefaultCommand.Location = new Point(5, 6);
             bDefaultCommand.Margin = new Padding(4, 3, 4, 3);
             bDefaultCommand.Name = "bDefaultCommand";
-            bDefaultCommand.Size = new Size(119, 23);
+            bDefaultCommand.Size = new Size(96, 42);
             bDefaultCommand.TabIndex = 2;
-            bDefaultCommand.Text = "Default Commands";
+            bDefaultCommand.Text = "Консольные команды";
             bDefaultCommand.UseVisualStyleBackColor = false;
-            bDefaultCommand.Click += DefaultCommandActivate;
             bDefaultCommand.MouseDown += ButtonMouseDown;
             bDefaultCommand.MouseEnter += ButtonMouseEnter;
             bDefaultCommand.MouseLeave += ButtonMouseLeave;
@@ -86,15 +87,15 @@
             // 
             bAllVoiceCommand.BackColor = Color.Black;
             bAllVoiceCommand.Cursor = Cursors.Hand;
+            bAllVoiceCommand.Font = new Font("Arial", 9F, FontStyle.Regular, GraphicsUnit.Point, 204);
             bAllVoiceCommand.ForeColor = Color.DarkGray;
-            bAllVoiceCommand.Location = new Point(132, 10);
+            bAllVoiceCommand.Location = new Point(109, 6);
             bAllVoiceCommand.Margin = new Padding(4, 3, 4, 3);
             bAllVoiceCommand.Name = "bAllVoiceCommand";
-            bAllVoiceCommand.Size = new Size(109, 23);
+            bAllVoiceCommand.Size = new Size(96, 42);
             bAllVoiceCommand.TabIndex = 3;
-            bAllVoiceCommand.Text = "Voice Commands";
+            bAllVoiceCommand.Text = "Голосовые команды";
             bAllVoiceCommand.UseVisualStyleBackColor = false;
-            bAllVoiceCommand.Click += AllVoiceCommandActivate;
             bAllVoiceCommand.MouseDown += ButtonMouseDown;
             bAllVoiceCommand.MouseEnter += ButtonMouseEnter;
             bAllVoiceCommand.MouseLeave += ButtonMouseLeave;
@@ -105,49 +106,40 @@
             // 
             bSoftCommand.BackColor = Color.Black;
             bSoftCommand.Cursor = Cursors.Hand;
+            bSoftCommand.Font = new Font("Arial", 9F, FontStyle.Regular, GraphicsUnit.Point, 204);
             bSoftCommand.ForeColor = Color.DarkGray;
-            bSoftCommand.Location = new Point(249, 10);
+            bSoftCommand.Location = new Point(213, 6);
             bSoftCommand.Margin = new Padding(4, 3, 4, 3);
             bSoftCommand.Name = "bSoftCommand";
-            bSoftCommand.Size = new Size(102, 23);
+            bSoftCommand.Size = new Size(96, 42);
             bSoftCommand.TabIndex = 4;
-            bSoftCommand.Text = "Soft Commands";
+            bSoftCommand.Text = "Созданные команды";
             bSoftCommand.UseVisualStyleBackColor = false;
-            bSoftCommand.Click += SoftCommandActivate;
             bSoftCommand.MouseDown += ButtonMouseDown;
             bSoftCommand.MouseEnter += ButtonMouseEnter;
             bSoftCommand.MouseLeave += ButtonMouseLeave;
             bSoftCommand.MouseMove += ButtonMouseMove;
             bSoftCommand.MouseUp += ButtonMouseUp;
             // 
-            // pictureBox1
-            // 
-            pictureBox1.Image = (Image)resources.GetObject("pictureBox1.Image");
-            pictureBox1.Location = new Point(756, 2);
-            pictureBox1.Margin = new Padding(4, 3, 4, 3);
-            pictureBox1.Name = "pictureBox1";
-            pictureBox1.Size = new Size(40, 40);
-            pictureBox1.TabIndex = 5;
-            pictureBox1.TabStop = false;
-            // 
             // lExplanation
             // 
+            lExplanation.AutoEllipsis = true;
             lExplanation.BackColor = Color.Black;
             lExplanation.BorderStyle = BorderStyle.Fixed3D;
-            lExplanation.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            lExplanation.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
             lExplanation.ForeColor = Color.FloralWhite;
-            lExplanation.Location = new Point(4, 166);
+            lExplanation.Location = new Point(4, 88);
             lExplanation.Margin = new Padding(4, 0, 4, 0);
             lExplanation.Name = "lExplanation";
-            lExplanation.Size = new Size(792, 151);
+            lExplanation.Size = new Size(792, 81);
             lExplanation.TabIndex = 6;
             lExplanation.Text = "Command";
             // 
             // lInfoComplete
             // 
             lInfoComplete.AutoSize = true;
-            lInfoComplete.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            lInfoComplete.Location = new Point(356, 14);
+            lInfoComplete.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+            lInfoComplete.Location = new Point(520, 33);
             lInfoComplete.Margin = new Padding(4, 0, 4, 0);
             lInfoComplete.Name = "lInfoComplete";
             lInfoComplete.Size = new Size(74, 15);
@@ -158,55 +150,53 @@
             // bListUp
             // 
             bListUp.Cursor = Cursors.Hand;
-            bListUp.Font = new Font("Segoe UI Black", 11F, FontStyle.Bold, GraphicsUnit.Point);
+            bListUp.Font = new Font("Arial", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 204);
             bListUp.ForeColor = SystemColors.ActiveCaptionText;
-            bListUp.Location = new Point(695, 10);
+            bListUp.Location = new Point(317, 28);
             bListUp.Margin = new Padding(4, 3, 4, 3);
             bListUp.Name = "bListUp";
-            bListUp.Size = new Size(24, 24);
+            bListUp.Size = new Size(93, 23);
             bListUp.TabIndex = 8;
-            bListUp.Text = "ᐃ";
+            bListUp.Text = "Сл. команда";
             bListUp.UseVisualStyleBackColor = true;
-            bListUp.Click += ButtonListChange_Click;
             // 
             // bListDown
             // 
             bListDown.Cursor = Cursors.Hand;
-            bListDown.Font = new Font("Segoe UI Black", 11F, FontStyle.Bold, GraphicsUnit.Point);
+            bListDown.Font = new Font("Arial", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 204);
             bListDown.ForeColor = SystemColors.ActiveCaptionText;
-            bListDown.Location = new Point(725, 10);
+            bListDown.Location = new Point(317, 4);
             bListDown.Margin = new Padding(4, 3, 4, 3);
             bListDown.Name = "bListDown";
-            bListDown.Size = new Size(24, 24);
+            bListDown.Size = new Size(93, 23);
             bListDown.TabIndex = 9;
-            bListDown.Text = "ᐁ";
+            bListDown.Text = "Пр. команда";
             bListDown.UseVisualStyleBackColor = true;
-            bListDown.Click += ButtonListChange_Click;
             // 
             // lPositionInformationCommand
             // 
-            lPositionInformationCommand.Font = new Font("Segoe UI Symbol", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            lPositionInformationCommand.Location = new Point(542, 11);
+            lPositionInformationCommand.AutoEllipsis = true;
+            lPositionInformationCommand.Font = new Font("Segoe UI Symbol", 9F, FontStyle.Bold);
+            lPositionInformationCommand.Location = new Point(650, 4);
             lPositionInformationCommand.Margin = new Padding(4, 0, 4, 0);
             lPositionInformationCommand.Name = "lPositionInformationCommand";
             lPositionInformationCommand.Size = new Size(149, 23);
             lPositionInformationCommand.TabIndex = 10;
             lPositionInformationCommand.Text = "XXXXXXXX/XXXXXXXX";
-            lPositionInformationCommand.TextAlign = ContentAlignment.MiddleRight;
+            lPositionInformationCommand.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // bCopyCommand
             // 
             bCopyCommand.BackColor = Color.Black;
             bCopyCommand.Cursor = Cursors.Hand;
             bCopyCommand.ForeColor = Color.DarkGray;
-            bCopyCommand.Location = new Point(5, 324);
+            bCopyCommand.Location = new Point(663, 61);
             bCopyCommand.Margin = new Padding(4, 3, 4, 3);
             bCopyCommand.Name = "bCopyCommand";
-            bCopyCommand.Size = new Size(104, 24);
+            bCopyCommand.Size = new Size(133, 24);
             bCopyCommand.TabIndex = 11;
-            bCopyCommand.Text = "Copy Command";
+            bCopyCommand.Text = "Копировать команду";
             bCopyCommand.UseVisualStyleBackColor = false;
-            bCopyCommand.Click += BCopyCommand_Click;
             bCopyCommand.MouseDown += ButtonMouseDown;
             bCopyCommand.MouseEnter += ButtonMouseEnter;
             bCopyCommand.MouseLeave += ButtonMouseLeave;
@@ -216,27 +206,12 @@
             // 
             tbSearch.BackColor = Color.Black;
             tbSearch.ForeColor = Color.DimGray;
-            tbSearch.Location = new Point(542, 329);
+            tbSearch.Location = new Point(528, 304);
             tbSearch.Name = "tbSearch";
-            tbSearch.Size = new Size(186, 23);
+            tbSearch.Size = new Size(194, 23);
             tbSearch.TabIndex = 14;
             tbSearch.Text = "Поиск элемента";
             tbSearch.TextAlign = HorizontalAlignment.Center;
-            tbSearch.TextChanged += TbSearch_TextChanged;
-            tbSearch.Enter += TbSearch_Enter;
-            tbSearch.Leave += TbSearch_Leave;
-            // 
-            // lSearchText
-            // 
-            lSearchText.BackColor = Color.Black;
-            lSearchText.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
-            lSearchText.ForeColor = Color.White;
-            lSearchText.Location = new Point(401, 332);
-            lSearchText.Name = "lSearchText";
-            lSearchText.Size = new Size(138, 16);
-            lSearchText.TabIndex = 15;
-            lSearchText.Text = "Элементы не найдены";
-            lSearchText.TextAlign = ContentAlignment.MiddleRight;
             // 
             // cbCommands
             // 
@@ -245,9 +220,9 @@
             cbCommands.ForeColor = Color.White;
             cbCommands.FormattingEnabled = true;
             cbCommands.ImeMode = ImeMode.On;
-            cbCommands.Location = new Point(4, 46);
+            cbCommands.Location = new Point(419, 4);
             cbCommands.Name = "cbCommands";
-            cbCommands.Size = new Size(689, 23);
+            cbCommands.Size = new Size(228, 23);
             cbCommands.TabIndex = 16;
             // 
             // bSearch
@@ -255,13 +230,12 @@
             bSearch.BackColor = Color.Black;
             bSearch.Cursor = Cursors.Hand;
             bSearch.ForeColor = Color.DarkGray;
-            bSearch.Location = new Point(734, 328);
+            bSearch.Location = new Point(728, 303);
             bSearch.Name = "bSearch";
-            bSearch.Size = new Size(64, 25);
+            bSearch.Size = new Size(69, 25);
             bSearch.TabIndex = 17;
-            bSearch.Text = "Search";
+            bSearch.Text = "Искать";
             bSearch.UseVisualStyleBackColor = false;
-            bSearch.Click += BSearch_Click;
             bSearch.MouseDown += ButtonMouseDown;
             bSearch.MouseEnter += ButtonMouseEnter;
             bSearch.MouseLeave += ButtonMouseLeave;
@@ -272,13 +246,12 @@
             bItemUpdate.BackColor = Color.Black;
             bItemUpdate.Cursor = Cursors.Hand;
             bItemUpdate.ForeColor = Color.DarkGray;
-            bItemUpdate.Location = new Point(699, 45);
+            bItemUpdate.Location = new Point(419, 27);
             bItemUpdate.Name = "bItemUpdate";
             bItemUpdate.Size = new Size(97, 25);
             bItemUpdate.TabIndex = 18;
-            bItemUpdate.Text = "Move Element";
+            bItemUpdate.Text = "Активировать";
             bItemUpdate.UseVisualStyleBackColor = false;
-            bItemUpdate.Click += BSearchItem_Click;
             bItemUpdate.MouseDown += ButtonMouseDown;
             bItemUpdate.MouseEnter += ButtonMouseEnter;
             bItemUpdate.MouseLeave += ButtonMouseLeave;
@@ -287,16 +260,50 @@
             // lExampleWriteCommand
             // 
             lExampleWriteCommand.BackColor = Color.Black;
-            lExampleWriteCommand.BorderStyle = BorderStyle.Fixed3D;
-            lExampleWriteCommand.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            lExampleWriteCommand.BorderStyle = BorderStyle.FixedSingle;
+            lExampleWriteCommand.Font = new Font("Arial", 9.75F, FontStyle.Bold);
             lExampleWriteCommand.ForeColor = Color.FloralWhite;
-            lExampleWriteCommand.Location = new Point(4, 128);
+            lExampleWriteCommand.Location = new Point(201, 62);
             lExampleWriteCommand.Margin = new Padding(4, 0, 4, 0);
             lExampleWriteCommand.Name = "lExampleWriteCommand";
-            lExampleWriteCommand.Size = new Size(792, 29);
+            lExampleWriteCommand.Size = new Size(456, 23);
             lExampleWriteCommand.TabIndex = 19;
             lExampleWriteCommand.Text = "Command";
             lExampleWriteCommand.TextAlign = ContentAlignment.MiddleLeft;
+            // 
+            // lbSeachCommands
+            // 
+            lbSeachCommands.BackColor = Color.Black;
+            lbSeachCommands.ForeColor = Color.White;
+            lbSeachCommands.FormattingEnabled = true;
+            lbSeachCommands.ItemHeight = 15;
+            lbSeachCommands.Items.AddRange(new object[] { "1", "2", "3", "4", "5", "6", "7", "8", "9" });
+            lbSeachCommands.Location = new Point(335, 203);
+            lbSeachCommands.Name = "lbSeachCommands";
+            lbSeachCommands.Size = new Size(461, 94);
+            lbSeachCommands.TabIndex = 20;
+            // 
+            // bClearSearch
+            // 
+            bClearSearch.BackColor = Color.Black;
+            bClearSearch.Cursor = Cursors.Hand;
+            bClearSearch.ForeColor = Color.DarkGray;
+            bClearSearch.Location = new Point(335, 302);
+            bClearSearch.Name = "bClearSearch";
+            bClearSearch.Size = new Size(76, 25);
+            bClearSearch.TabIndex = 21;
+            bClearSearch.Text = "Очистить";
+            bClearSearch.UseVisualStyleBackColor = false;
+            // 
+            // lNameSearch
+            // 
+            lNameSearch.AutoSize = true;
+            lNameSearch.Font = new Font("Arial", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 204);
+            lNameSearch.Location = new Point(333, 186);
+            lNameSearch.Name = "lNameSearch";
+            lNameSearch.Size = new Size(47, 16);
+            lNameSearch.TabIndex = 22;
+            lNameSearch.Text = "Поиск:";
             // 
             // FormExplanationCommands
             // 
@@ -304,6 +311,8 @@
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.ActiveCaptionText;
             ClientSize = new Size(800, 356);
+            Controls.Add(bClearSearch);
+            Controls.Add(lbSeachCommands);
             Controls.Add(lExampleWriteCommand);
             Controls.Add(bCopyCommand);
             Controls.Add(lExplanation);
@@ -311,16 +320,15 @@
             Controls.Add(bItemUpdate);
             Controls.Add(bSearch);
             Controls.Add(cbCommands);
-            Controls.Add(lSearchText);
             Controls.Add(tbSearch);
             Controls.Add(lPositionInformationCommand);
             Controls.Add(bListDown);
             Controls.Add(bListUp);
-            Controls.Add(pictureBox1);
             Controls.Add(bSoftCommand);
             Controls.Add(bAllVoiceCommand);
             Controls.Add(bDefaultCommand);
             Controls.Add(INameCommand);
+            Controls.Add(lNameSearch);
             ForeColor = SystemColors.Control;
             Icon = (Icon)resources.GetObject("$this.Icon");
             Margin = new Padding(4, 3, 4, 3);
@@ -329,9 +337,7 @@
             SizeGripStyle = SizeGripStyle.Hide;
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Information Commands";
-            Deactivate += ApplicationInfoCommandCLR_Deactivate;
             FormClosing += ApplicationInfoCommandCLR_FormClosing;
-            ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -341,19 +347,20 @@
         public Label INameCommand;
         private Button bDefaultCommand;
         private Button bAllVoiceCommand;
-        private PictureBox pictureBox1;
         public Label lExplanation;
         private Button bListUp;
         private Button bListDown;
         private Label lPositionInformationCommand;
         private Button bCopyCommand;
         private TextBox tbSearch;
-        private Label lSearchText;
         private ComboBox cbCommands;
         private Button bSearch;
         private Button bItemUpdate;
         public Label lInfoComplete;
         private Button bSoftCommand;
         public Label lExampleWriteCommand;
+        private ListBox lbSeachCommands;
+        private Button bClearSearch;
+        private Label lNameSearch;
     }
 }

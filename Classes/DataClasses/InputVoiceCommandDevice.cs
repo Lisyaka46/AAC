@@ -18,7 +18,7 @@ namespace AAC.Classes.DataClasses
         /// <summary>
         /// Коэффициент точности распознавания голосовых фраз
         /// </summary>
-        public static readonly float FactorAccuracyVoice = 0.6f;
+        public static readonly float FactorAccuracyVoice = 0.68f;
 
         /// <summary>
         /// Встроенные голосовые фразы 
@@ -95,9 +95,10 @@ namespace AAC.Classes.DataClasses
                 {
                     if (MainData.Flags.AudioCommand == StatusFlags.Sleep)
                     {
-                        Activate();
-                        MainData.Flags.AudioCommand = StatusFlags.Active;
                         Apps.MainForm.VoiceButtonImageUpdate(StatusFlags.Active, false);
+                        MainData.Flags.AudioCommand = StatusFlags.Active;
+                        Activate();
+                        if (Apps.MainForm.StateAnimWindow != StateAnimateWindow.Active) MainData.MainMP3.PlaySound("Complete");
                     }
                     return Task.FromResult(CommandStateResult.Completed);
                 })

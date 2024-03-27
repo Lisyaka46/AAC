@@ -2,9 +2,11 @@
 using AAC.Classes.Commands;
 using AAC.Classes.DataClasses;
 using IWshRuntimeLibrary;
+using System.ComponentModel;
 using System.Data;
 using System.Data.OleDb;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using static AAC.Classes.AnimationDL.Animate;
@@ -335,7 +337,7 @@ namespace AAC
                         {
                             int u = Convert.ToInt32(param[0]), v = Convert.ToInt32(param[1]);
                             (int, int) PythagorTree = (u * u - v * v, 2 * u * v);
-                            return Task.FromResult(new CommandStateResult(ResultState.Complete, $">>> Pythagorean_three this: {PythagorTree.Item1} + {PythagorTree.Item2}i = {u * u + v * v}\n", string.Empty));
+                            return Task.FromResult(new CommandStateResult(ResultState.Complete, $">>> Pythagorean_three this: {u} + {v}i = {PythagorTree.Item1} + {PythagorTree.Item2}\n", string.Empty));
                         }
                         else
                         {
@@ -373,12 +375,110 @@ namespace AAC
         {
             return
             [
-                new VoiceCommand(["ты работаешь"], null, () =>
+                new VoiceCommand(["ты работаешь", "ты жив"], "Воспроизводит звук подтверждая что голосовые команды работают", () =>
                 {
                     MainData.MainMP3.PlaySound("YesVoice");
                     return Task.FromResult(CommandStateResult.Completed);
                 }),
+                new VoiceCommand(["закрой программу", "закрыть программу"], "Завершает работу программы", () =>
+                {
+                    ConsoleCommand.ReadConsoleCommand(MainData.MainCommandData.MassConsoleCommand, "close");
+                    return Task.FromResult(CommandStateResult.Completed);
+                }),
+                new VoiceCommand(["очистить", "очисти вывод", "очисти консоль"], "Очищает вывод консоли", () =>
+                {
+                    ConsoleCommand.ReadConsoleCommand(MainData.MainCommandData.MassConsoleCommand, "clear");
+                    return Task.FromResult(CommandStateResult.Completed);
+                }),
+                new VoiceCommand(["активируй программу", "появись", "развернуть программу"], "Разворачивает программу делая её активным окном", () =>
+                {
+                    if (Apps.MainForm.StateAnimWindow != StateAnimateWindow.Active)
+                        Apps.MainForm.UnfoldingApplication(null, null);
+                    return Task.FromResult(CommandStateResult.Completed);
+                }),
+                new VoiceCommand(["блок", "заблокировать компьютер", "заблокируй компьютер"], "Блокирует компьютер выводя начальный экран", () =>
+                {
+                    if (!DLLMethods.LockWorkStation()) throw new Win32Exception(Marshal.GetLastWin32Error());
+                    return Task.FromResult(CommandStateResult.Completed);
+                }),
+                new VoiceCommand(["выключи голосовые команды", "отключи голос", "отключить голос"], "Выключает голосовые команды", () =>
+                {
+                    Apps.MainForm.VoiceButtonImageUpdate(StatusFlags.Sleep, false);
+                    MainData.InputVoiceDevice.Diactivate();
+                    MainData.Flags.AudioCommand = StatusFlags.Sleep;
+                    if (Apps.MainForm.StateAnimWindow != StateAnimateWindow.Active) MainData.MainMP3.PlaySound("Complete");
+                    return Task.FromResult(CommandStateResult.Completed);
+                }),
             ];
         }
+        /*private CommandStateResult ExecuteVoiceCommand()
+        {
+            switch (ID)
+            {
+                case 6: // спрячся
+                    Apps.MainForm.FoldingMoveApplication(null, null);
+                    return CommandStateResult.Completed;
+                case 7: // открой рабочую директорию
+                    Process.Start("explorer.exe", Directory.GetCurrentDirectory());
+                    return CommandStateResult.Completed;
+                case 8: // сверни всё
+                    Apps.MainForm.Show();
+                    if (DLLMethods.ShellGUID("DesktopVisualTrue")) MainData.MainMP3.PlaySound("Complete");
+                    return CommandStateResult.Completed;
+                case 9: // открой панель управления
+                    if (DLLMethods.ShellGUID("CommandPanelWin")) MainData.MainMP3.PlaySound("Complete");
+                    return CommandStateResult.Completed;
+                case 12: // выключи голосовые команды
+                    Apps.MainForm.pbVoiceButton.Image = Image.FromFile(@"Data\Image\Micro\MicroSleepingNotMouse.png");
+                    MainData.Flags.AudioCommand = StatusFlags.Sleep;
+                    if (Apps.MainForm.WindowState != FormWindowState.Normal)
+                        MainData.MainMP3.PlaySound("Complete");
+                    return CommandStateResult.Completed;
+                case 13: // закрой окно информации
+                    if (Apps.InformationCommand.Visible)
+                    {
+                        Apps.InformationCommand.Close();
+                        if (Apps.MainForm.WindowState != FormWindowState.Normal)
+                            MainData.MainMP3.PlaySound("Complete");
+                    }
+                    return CommandStateResult.Completed;
+                case 14: // сколько времени
+                    /*
+                    using System.Speech.Synthesis;
+
+namespace ConsoleApplication5
+    {
+        class Program
+        {
+
+            static void Main(string[] args)
+            {
+                SpeechSynthesizer synthesizer = new SpeechSynthesizer();
+                synthesizer.Volume = 100;  // 0...100
+                synthesizer.Rate = -2;     // -10...10
+
+                // Synchronous
+                synthesizer.Speak("Hello World");
+
+                // Asynchronous
+                synthesizer.SpeakAsync("Hello World");
+
+
+
+            }
+
+        }
+    }
+    TimeTempus();
+                    return CommandStateResult.Completed;
+                case 15:
+                    Apps.MainForm.pbVoiceButton.Image = Image.FromFile(@"Data\Image\Micro\MicroActivateNotMouse.png");
+                    MainData.Flags.AudioCommand = StatusFlags.Active;
+                    return CommandStateResult.Completed;
+            }
+            return new CommandStateResult(ResultState.Failed,
+                $">>> Voice command ID: {ID} is Invalid",
+                $"Голосовая команда ID: {ID} не нраспознана");
+        }*/
     }
 }

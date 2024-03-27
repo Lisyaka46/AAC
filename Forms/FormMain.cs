@@ -95,7 +95,7 @@ namespace AAC
         /// <summary>
         /// Состояние окна главной формы
         /// </summary>
-        private StateAnimateWindow StateAnimWindow { get; set; }
+        public StateAnimateWindow StateAnimWindow { get; private set; }
 
         /// <summary>
         /// подсказки к командам
@@ -854,7 +854,6 @@ namespace AAC
         /// <param name="MouseEnter">Касается ли курсор объекта</param>
         public void VoiceButtonImageUpdate(StatusFlags flag, bool MouseEnter)
         {
-            if (!Flags.FormActivity.Value) return;
             string DirectoryImage = @"Data\Image\Micro\Micro";
             DirectoryImage += flag switch
             {
@@ -866,6 +865,7 @@ namespace AAC
             DirectoryImage += $"{(MouseEnter ? "Yes" : "Not")}Mouse.png";
             pbVoiceButton.ImageLocation = DirectoryImage;
             pbVoiceButton.Image = Image.FromFile(DirectoryImage);
+            pbVoiceButton.Refresh();
         }
 
         private void VoiceButtonUpdateMouseEnter(object sender, EventArgs e)
