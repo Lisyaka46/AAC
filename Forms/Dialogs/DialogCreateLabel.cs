@@ -95,7 +95,7 @@ namespace AAC.Forms.Dialogs
                 case 1:
                 case 2:
                     tbPreviewAction.ReadOnly = false;
-                    tbPreviewAction.MaxLength = App.MainForm.tbInput.MaxLength;
+                    tbPreviewAction.MaxLength = Apps.MainForm.tbInput.MaxLength;
                     tbPreviewAction.Cursor = Cursors.IBeam;
                     break;
             }

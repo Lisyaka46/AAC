@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static AAC.Classes.DataClasses.SettingsData;
+using static AAC.Startcs;
 
 namespace AAC.Classes.DataClasses.SpecialColorClasses
 {
@@ -51,7 +52,7 @@ namespace AAC.Classes.DataClasses.SpecialColorClasses
             {
                 while (true)
                 {
-                    if (Parameter.Value && App.MainForm.WindowState == FormWindowState.Normal)
+                    if (Parameter.Value && Apps.MainForm.WindowState == FormWindowState.Normal)
                     {
                         RealyColor = Color.FromArgb(
                             Convert.ToInt32(Math.Abs((Math.Atan(Cursor.Position.X) - Cursor.Position.Y) / 5) % 256d),

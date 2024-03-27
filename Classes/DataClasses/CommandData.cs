@@ -15,12 +15,12 @@ namespace AAC.Classes.DataClasses
         /// <summary>
         /// Массив консольных команд
         /// </summary>
-        public ConsoleCommand[] MassConsoleCommand { get; }
+        public readonly ConsoleCommand[] MassConsoleCommand;
 
         /// <summary>
         /// Массив голосовых команд
         /// </summary>
-        public VoiceCommand[] MassVoiceCommand { get; }
+        public readonly VoiceCommand[] MassVoiceCommand;
 
         /// <summary>
         /// Инициализировать объект данных команд

@@ -133,7 +133,7 @@ namespace AAC.Forms.Dialogs
                 Element.LabelNameTheme.Text = tbNameTheme.Text;
                 Element.LabelDescriptionTheme.Tag = tbDesctiprion.Text;
                 */
-                App.Settings.ThemesCreated.SaveThemeInFile(CreateNewTheme);
+                Apps.ThemesCreated.SaveThemeInFile(CreateNewTheme);
             }
             Close();
         }

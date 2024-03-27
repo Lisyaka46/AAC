@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static AAC.Classes.DataClasses.SettingsData;
+using static AAC.Startcs;
 
 namespace AAC.Classes.DataClasses.SpecialColorClasses
 {
@@ -62,7 +63,7 @@ namespace AAC.Classes.DataClasses.SpecialColorClasses
             {
                 while (true)
                 {
-                    if (Parameter.Value && App.MainForm.WindowState == FormWindowState.Normal)
+                    if (Parameter.Value && Apps.MainForm.WindowState == FormWindowState.Normal)
                     {
                         PointVolume = (int)(Device.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia).AudioMeterInformation.MasterPeakValue * 100);
                         R = (int)(2.55f * PointVolume + ActientColorSC.R);

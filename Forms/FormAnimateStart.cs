@@ -7,11 +7,21 @@ namespace AAC
         public FormAnimateStart()
         {
             InitializeComponent();
-        }
-
-        private void FormAnimateStart_Shown(object sender, EventArgs e)
-        {
-            MainData.MainMP3.PlaySound("StartingFile");
+            Shown += async (sender, e) =>
+            {
+                MainData.MainMP3.PlaySound("StartingSound");
+                await Task.Run(() =>
+                {
+                    while (Opacity > 0d)
+                    {
+                        Opacity -= 0.009d;
+                        Thread.Sleep(1);
+                    }
+                    Opacity = 0d;
+                    Visible = false;
+                    Close();
+                });
+            };
         }
     }
 }

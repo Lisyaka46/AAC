@@ -103,44 +103,6 @@ namespace AAC
         }
 
         /// <summary>
-        /// Воспроизвести цифры времени
-        /// </summary>
-        public static async void TimeTempus()
-        {
-            int hour = Convert.ToInt32(DateTime.Now.ToString("HH")), hour10 = hour % 10;
-            int min = Convert.ToInt32(DateTime.Now.ToString("mm")), min10 = min % 10;
-            await Task.Run(() =>
-            {
-                MainData.MainMP3.PlaySound($"Clock\\{StringNumberConvert(hour, true)}");
-                if (hour >= 20)
-                {
-                    Thread.Sleep(500);
-                    MainData.MainMP3.PlaySound($"Clock\\{StringNumberConvert(hour10)}");
-                }
-                Thread.Sleep(200);
-
-                if (min == 1 || min == 2)
-                {
-                    Thread.Sleep(285);
-                    MainData.MainMP3.PlaySound($"Clock\\{StringNumberConvert(min, true)}МИН");
-                }
-                else
-                {
-                    Thread.Sleep(285);
-                    MainData.MainMP3.PlaySound($"Clock\\{StringNumberConvert(min, true)}");
-                }
-                if (min >= 20)
-                {
-                    Thread.Sleep(535);
-                    if (min10 == 1 || min10 == 2)
-                        MainData.MainMP3.PlaySound($"Clock\\{StringNumberConvert(min10)}МИН");
-                    else
-                        MainData.MainMP3.PlaySound($"Clock\\{StringNumberConvert(min10)}");
-                }
-            });
-        }
-
-        /// <summary>
         /// Произвести переход между панелями
         /// </summary>
         /// <param name="OpenPanel">Выезжающая панель</param>

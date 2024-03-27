@@ -2,7 +2,6 @@ using AAC.GUI;
 using static AAC.Classes.AnimationDL.Animate.AnimFormule;
 using static AAC.Startcs;
 using AAC.Classes;
-using static AAC.Log;
 using System.Reflection.Metadata.Ecma335;
 using System.Diagnostics;
 using MMC20;

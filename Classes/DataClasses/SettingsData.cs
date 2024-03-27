@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using System.Text.RegularExpressions;
+using static AAC.Startcs;
 
 namespace AAC.Classes.DataClasses
 {
@@ -113,77 +114,77 @@ namespace AAC.Classes.DataClasses
         /// <summary>
         /// Параметр настроек <b>"Градиент специального цвета SC"</b>
         /// </summary>
-        public SettingsParameter Color_Gradient_SC { get; }
+        public readonly SettingsParameter Color_Gradient_SC;
 
         /// <summary>
         /// Параметр настроек <b>"Размер текста в консольной строке"</b>
         /// </summary>
-        public SettingsParameter Font_Size_Console_Text { get; }
+        public readonly SettingsParameter Font_Size_Console_Text;
 
         /// <summary>
         /// Параметр настроек <b>"Выключение Alt режима при закрытии PAC"</b>
         /// </summary>
-        public SettingsBoolParameter Alt_Diactivate_PAC { get; }
+        public readonly SettingsBoolParameter Alt_Diactivate_PAC;
 
         /// <summary>
         /// Параметр настроек <b>"Использование специальных цветов"</b>
         /// </summary>
-        public SettingsBoolParameter All_SpecialColor_Activate { get; }
+        public readonly SettingsBoolParameter All_SpecialColor_Activate;
 
         /// <summary>
         /// Параметр настроек <b>"Специальный цвет RGB"</b>
         /// </summary>
-        public SettingsBoolParameter SpecialColor_RGB { get; }
+        public readonly SettingsBoolParameter SpecialColor_RGB;
 
         /// <summary>
         /// Параметр настроек <b>"Специальный цвет RGBCC"</b>
         /// </summary>
-        public SettingsBoolParameter SpecialColor_RGBCC { get; }
+        public readonly SettingsBoolParameter SpecialColor_RGBCC;
 
         /// <summary>
         /// Параметр настроек <b>"Специальный цвет SC"</b>
         /// </summary>
-        public SettingsBoolParameter SpecialColor_SC { get; }
+        public readonly SettingsBoolParameter SpecialColor_SC;
 
         /// <summary>
         /// Параметр настроек <b>"Режим разработчика"</b>
         /// </summary>
-        public SettingsBoolParameter Developer_Mode { get; }
+        public readonly SettingsBoolParameter Developer_Mode;
 
         /// <summary>
         /// Параметр настроек <b>"Активация голосовых команд"</b>
         /// </summary>
-        public SettingsBoolParameter Activation_Microphone { get; }
+        public readonly SettingsBoolParameter Activation_Microphone;
 
         /// <summary>
         /// Параметр настроек <b>"Изменение позиции главной формы за границей экрана"</b>
         /// </summary>
-        public SettingsBoolParameter Moving_Border_Screen_Form { get; }
+        public readonly SettingsBoolParameter Moving_Border_Screen_Form;
 
         /// <summary>
         /// Параметр настроек <b>"Подсказки к командам"</b>
         /// </summary>
-        public SettingsBoolParameter Hit_Panel { get; }
+        public readonly SettingsBoolParameter Hit_Panel;
 
         /// <summary>
         /// Кол-во вместимых объектов в буфер
         /// </summary>
-        public SettingsParameter Buffer_Count_Elements { get; private set; }
+        public readonly SettingsParameter Buffer_Count_Elements;
 
         /// <summary>
         /// Параметр настроек <b>"Использовать LAlt режим только для включения, RAlt только для выключения Alt режима в PAC"</b>
         /// </summary>
-        public SettingsBoolParameter Alt_OrientationLR_PAC { get; }
+        public readonly SettingsBoolParameter Alt_OrientationLR_PAC;
 
         /// <summary>
         /// Клавиша для отключения Alt режима в PAC
         /// </summary>
-        public SettingsParameter HC_Alt_Diactivate_PAC { get; private set; }
+        public readonly SettingsParameter HC_Alt_Diactivate_PAC;
 
         /// <summary>
         /// Клавиша для включения Alt режима в PAC
         /// </summary>
-        public SettingsParameter HC_Alt_Activate_PAC { get; private set; }
+        public readonly SettingsParameter HC_Alt_Activate_PAC;
 
         /// <summary>
         /// Инициализировать все начальные настройки
@@ -313,6 +314,13 @@ namespace AAC.Classes.DataClasses
             {
                 if (NewValue.GetType() == typeof(Color)) NewValue = $"={((Color)NewValue).R};{((Color)NewValue).G};{((Color)NewValue).B}";
                 else if (NewValue.GetType() == typeof(bool)) NewValue = (bool)NewValue ? "1" : "0";
+                else NewValue = NewValue.ToString() ?? string.Empty;
+
+                if (((string)NewValue).Length == 0)
+                {
+                    ObjLog.LOGTextAppend($"Сохранение параметра {Name} было проигнорировано..");
+                    return false;
+                }
 
                 string[] AllLines = File.ReadAllLines(DitectoryOptionFile);
                 if (AllLines.Any(i => i.Contains($"={Name}:")))

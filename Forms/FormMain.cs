@@ -15,48 +15,6 @@ namespace AAC
 {
     public partial class MainApplication : Form
     {
-        /// <summary>
-        /// Лист определённых объектов ярлыков
-        /// </summary>
-        /// <typeparam name="T">Объекты ярлыков</typeparam>
-        public class ListLabel<T> : List<T> where T : IELLabelAccess
-        {
-            /// <summary>
-            /// Добавить и отсортировать добавляемый ярлык
-            /// </summary>
-            /// <param name="Element">Добавляемый объект ярыка</param>
-            public new void Add(T Element)
-            {
-                int NumStatus = (int)Element.Status;
-                if (Count > 0)
-                {
-                    if (NumStatus == 0 && this[^1].Status == TypeLabel.System || NumStatus == 2)
-                    {
-                        Element.SetLocationIndex(Count);
-                        base.Add(Element);
-                    }
-                    else
-                    {
-                        int i = 0;
-                        while (NumStatus >= (int)this[i].Status && i < Count) i++;
-                        Element.SetLocationIndex(i);
-                        Insert(i++, Element);
-                        for (; i < Count; i++) this[i].SetLocationIndex(i);
-                    }
-                }
-                else base.Add(Element);
-            }
-
-            /// <summary>
-            /// Удалить объект ярлыка по индексу
-            /// </summary>
-            /// <param name="Index">Индекс объекта ярлыка</param>
-            public new void RemoveAt(int Index)
-            {
-                this[Index].Dispose();
-                base.RemoveAt(Index);
-            }
-        }
 
         /// <summary>
         /// Класс объекта флагов формы
@@ -119,17 +77,12 @@ namespace AAC
         /// </summary>
         public const string ObjLabelFilePath = $"Data\\Info\\Label.r1";
 
-        private object ResHit { get; set; }
-
         /// <summary>
         /// Активная панель в PAC
         /// </summary>
         private Panel ActivatePACPanelPage { get; set; }
 
         private Point StartCursorMovingtbOutput { get; set; }
-
-        //
-        public int ChangeLengthBuffer { get; set; }
 
         //
         private int IndexConsoleReadBuffer = -1;
@@ -183,9 +136,10 @@ namespace AAC
             InitializeComponent();
             PAC_Buffer.InitializeNewBuffer((int)MainData.Settings.Buffer_Count_Elements.Value);
             lHit.Dispose();
-            ResHit = new();
+            //ResHit = new();
 
-            /* Создание отслеживания флагов */ if ((bool)MainData.Settings.Developer_Mode)
+            /* Создание отслеживания флагов */
+            if ((bool)MainData.Settings.Developer_Mode)
             {
                 SetEventFlag(Flags.Information, clbDeveloperFlags, clbDeveloperFlags.Items.Add(nameof(Flags.Information)));
 
@@ -208,7 +162,6 @@ namespace AAC
                 SetEventFlag(Flags.ActiveSettingsMiniPanel, clbDeveloperFlags, clbDeveloperFlags.Items.Add(nameof(Flags.ActiveSettingsMiniPanel)));
             }
             
-            ChangeLengthBuffer = -1;
             StateAnimWindow = StateAnimateWindow.Hide;
             if (Screen.PrimaryScreen != null)
                 SavePositionAnimateWindow = new(Screen.PrimaryScreen.Bounds.Width / 2 - Size.Width / 2, Screen.PrimaryScreen.Bounds.Height / 2 - Size.Height / 2);
@@ -265,13 +218,13 @@ namespace AAC
             bRebootApplication.MouseClick += (sender, e) =>
             {
                 lInformationCursor.Hide();
-                ConsoleCommand.ReadConsoleCommand("reboot");
+                ConsoleCommand.ReadConsoleCommand(MainData.MainCommandData.MassConsoleCommand, "reboot");
             };
             bRebootApplication.MouseHover += (sender, e) => ActivateLabelInfo("Перезагружает программу");
             bRebootApplication.MouseLeave += (sender, e) => DisactivateLabelInfo();
 
 
-            pDeveloper.MouseWheel += (sender, e) => { MiniFunctions.UpdateVScrollBar(App.MainForm.sbhDebeloper, e.Delta); };
+            pDeveloper.MouseWheel += (sender, e) => { MiniFunctions.UpdateVScrollBar(Apps.MainForm.sbhDebeloper, e.Delta); };
             sbhDebeloper.ValueChanged += (sender, e) => { MiniFunctions.MoveElementinVScrollBar(pDeveloperElements, sbhDebeloper, 3); };
 
             //pmpBufferCommandButtons.MouseWheel += (sender, e) => { MiniFunctions.UpdateVScrollBar(App.MainForm.PAC_sbBuffer, e.Delta); };
@@ -283,7 +236,7 @@ namespace AAC
             PAC_bColoredTheme.ActivateButton += (KeyActivity) =>
             {
                 PAC_Disactivate();
-                ConsoleCommand.ReadConsoleCommand("colored");
+                ConsoleCommand.ReadConsoleCommand(MainData.MainCommandData.MassConsoleCommand, "colored");
             };
 
             // Кнопка в PAC "Изменить цвет текста"
@@ -297,14 +250,14 @@ namespace AAC
             PAC_bClearConsole.ActivateButton += (KeyActivity) =>
             {
                 PAC_Disactivate();
-                ConsoleCommand.ReadConsoleCommand("clear");
+                ConsoleCommand.ReadConsoleCommand(MainData.MainCommandData.MassConsoleCommand, "clear");
             };
 
             // Кнопка в PAC "Журнал сообщений"
             PAC_bLogMessage.ActivateButton += (KeyActivity) =>
             {
                 PAC_Disactivate();
-                ConsoleCommand.ReadConsoleCommand("log");
+                ConsoleCommand.ReadConsoleCommand(MainData.MainCommandData.MassConsoleCommand, "log");
             };
 
             //
@@ -421,6 +374,7 @@ namespace AAC
             Size = new(815, 577);
             MaximumSize = Size;
             MinimumSize = Size;
+            Opacity = 0d;
 
             lWhat.Size = new(20, 17);
             InputPanel.Size = new(InputPanel.Size.Width, 34);
@@ -448,6 +402,9 @@ namespace AAC
 
             if ((bool)MainData.Settings.Developer_Mode) ObjLog.LOGTextAppend("Объявлено что программу запустил разработчик");
             else pDeveloper.Hide();
+
+            CapsLock_Info.Image = Control.IsKeyLocked(Keys.CapsLock) ?
+                        Image.FromFile(@"Data\Image\Up-A.gif") : Image.FromFile(@"Data\Image\Down-a.gif");
         }
 
         /// <summary>
@@ -455,9 +412,9 @@ namespace AAC
         /// </summary>
         public void GenerateLabel()
         {
-            App.Create.DialogCreateLabel?.Dispose();
-            App.Create.DialogCreateLabel = new();
-            IELLabelAccess? GenerateLabelAccess = App.Create.DialogCreateLabel.GenerateLabelAccess(this, pAllVisualLabel);
+            Apps.DialogCreateLabel?.Dispose();
+            Apps.DialogCreateLabel = new();
+            IELLabelAccess? GenerateLabelAccess = Apps.DialogCreateLabel.GenerateLabelAccess(this, pAllVisualLabel);
             if (GenerateLabelAccess != null)
             {
                 Color MP = MainData.MainThemeData.ActivateTheme.ObjColors[7].ElColor;
@@ -528,19 +485,19 @@ namespace AAC
             if (MainData.Flags.AudioCommand == StatusFlags.Active)
             {
                 ObjLog.LOGTextAppend("Было обработано исключение на неполноценное выключение голосовых команд");
+                MainData.InputVoiceDevice.LimitationSpeech = true;
                 MainData.Flags.AudioCommand = StatusFlags.Sleep;
             }
             else if (MainData.Flags.AudioCommand == StatusFlags.Sleep)
             {
                 ObjLog.LOGTextAppend("Было обработано исключение на ПОЛНОЕ отключение голосовых команд");
-                //MainData.InputVoiceDevice.RecordInput.RecognizeAsyncStop();
-                //MainData.InputVoiceDevice.RecordInput.UnloadAllGrammars();
+                MainData.InputVoiceDevice.Diactivate();
                 MainData.Flags.AudioCommand = StatusFlags.NotActive;
             }
             else if (MainData.Flags.AudioCommand == StatusFlags.NotActive)
             {
                 ObjLog.LOGTextAppend("Было обработано исключение на выход из полного отключения голосовых команд");
-                //MainData.InputVoiceDevice.RecordInput.RecognizeAsync();
+                MainData.InputVoiceDevice.Activate();
                 MainData.Flags.AudioCommand = StatusFlags.Active;
             }
             VoiceButtonImageUpdate(MainData.Flags.AudioCommand, true);
@@ -709,8 +666,8 @@ namespace AAC
         private void PbCustom_DoubleClick(object sender, EventArgs e)
         {
             ObjLog.LOGTextAppend($"Вызвано диалоговое окно по установке кастомного GIF");
-            App.DialogCustomImage_Form = new DialogCustomImage();
-            App.DialogCustomImage_Form.ShowDialog();
+            Apps.DialogCustomImage_Form = new DialogCustomImage();
+            Apps.DialogCustomImage_Form.ShowDialog();
         }
 
         private void TbInput_TextChanged(object sender, EventArgs e)
@@ -883,6 +840,7 @@ namespace AAC
 
         private void ApplicationCLR_Shown(object sender, EventArgs e)
         {
+            new ConstAnimMove(Apps.MainForm.pICON.Location.X, 15, 8).InitAnimFormule(Apps.MainForm.pICON, Formules.QuickTransition, new(Apps.MainForm.pICON.Location.Y), AnimationStyle.XY);
             Location = new(Location.X, Location.Y + 150);
             WindowState = FormWindowState.Normal;
             Show();
@@ -894,7 +852,7 @@ namespace AAC
         /// </summary>
         /// <param name="flag">Статус параметра голосовых команд</param>
         /// <param name="MouseEnter">Касается ли курсор объекта</param>
-        private void VoiceButtonImageUpdate(StatusFlags flag, bool MouseEnter)
+        public void VoiceButtonImageUpdate(StatusFlags flag, bool MouseEnter)
         {
             if (!Flags.FormActivity.Value) return;
             string DirectoryImage = @"Data\Image\Micro\Micro";
@@ -941,7 +899,7 @@ namespace AAC
         private void BWhatInformation_MouseClick(object sender, MouseEventArgs e)
         {
             BWhatInformation_MouseLeave(null, null);
-            ConsoleCommand.ReadConsoleCommand("help");
+            ConsoleCommand.ReadConsoleCommand(MainData.MainCommandData.MassConsoleCommand, "help");
         }
 
         private void UpperPanelActivate(object sender, EventArgs e)
@@ -963,20 +921,20 @@ namespace AAC
 
         private void ActivateFormThanks(object sender, EventArgs e)
         {
-            App.Thanks = null;
-            App.MainForm.FoldingApplication(null, null);
+            Apps.Thanks = null;
+            Apps.MainForm.FoldingApplication(null, null);
             Flags.FormActivity.Value = false;
-            App.Thanks = new();
+            Apps.Thanks = new();
             Thread.Sleep(100);
-            App.Thanks.Show();
+            Apps.Thanks.Show();
         }
 
         public void BCloseMainApplication(object sender, EventArgs e)
         {
-            App.Log?.Close();
-            App.InformationCommand?.Close();
-            App.Settings.WindowSettings?.Close();
-            App.Settings.ThemesCreated?.Close();
+            Apps.Log?.Close();
+            Apps.InformationCommand?.Close();
+            Apps.WindowSettings?.Close();
+            Apps.ThemesCreated?.Close();
             Environment.Exit(0);
         }
 
@@ -990,7 +948,7 @@ namespace AAC
             if (StateAnimWindow != StateAnimateWindow.Hide && StateAnimWindow != StateAnimateWindow.HalfHide) return;
 
             ObjLog.LOGTextAppend("Главная форма активна");
-            App.MainForm.WindowState = FormWindowState.Normal;
+            Apps.MainForm.WindowState = FormWindowState.Normal;
             Flags.FormActivity.Value = true;
 
             if (StateAnimWindow == StateAnimateWindow.Hide)
@@ -1052,7 +1010,7 @@ namespace AAC
             if (StateAnimWindow == StateAnimateWindow.MoveHideMinus)
             {
                 Opacity = 0d;
-                App.MainForm.WindowState = FormWindowState.Minimized;
+                Apps.MainForm.WindowState = FormWindowState.Minimized;
                 StateAnimWindow = StateAnimateWindow.Hide;
             }
         }
@@ -1131,8 +1089,8 @@ namespace AAC
         public void BSettings_Click(object sender, EventArgs e)
         {
             ObjLog.LOGTextAppend("Была активирована форма настроек");
-            App.Settings.WindowSettings = new();
-            App.Settings.WindowSettings.ShowDialog();
+            Apps.WindowSettings = new();
+            Apps.WindowSettings.ShowDialog();
         }
 
         public void TbOutput_MouseClick(object sender, MouseEventArgs e)
@@ -1154,7 +1112,7 @@ namespace AAC
         private void PAC_Activate(bool LabelAccessDetect = false)
         {
             const int OffsetX = 5, OffsetY = -30, WidthA = 212, HeightA = 221;
-            int XPos = Cursor.Position.X - App.MainForm.Location.X + OffsetX, YPos = Cursor.Position.Y - App.MainForm.Location.Y + OffsetY;
+            int XPos = Cursor.Position.X - Apps.MainForm.Location.X + OffsetX, YPos = Cursor.Position.Y - Apps.MainForm.Location.Y + OffsetY;
             int ConstX, ConstY;
             if (pDeveloper.Location.X <= tbOutput.Location.X + tbOutput.Size.Width)
             {
@@ -1295,7 +1253,7 @@ namespace AAC
             PAC_bClearBuffer.Location = new(82, PAC_Buffer.ElementsBuffer.Count > 0 ? 3 : -29);
             //PAC_sbBuffer.Visible = MainData.Settings.BufferCommand.Count > 0;
             //PAC_sbBuffer.Location = new(189, PAC_sbBuffer.Location.Y);
-            App.MainForm.PAC_lBufferCount.Text = $"{PAC_Buffer.ElementsBuffer.Count}/{PAC_Buffer.ElementsBuffer.Length}";
+            Apps.MainForm.PAC_lBufferCount.Text = $"{PAC_Buffer.ElementsBuffer.Count}/{PAC_Buffer.ElementsBuffer.Length}";
             if (PAC_Buffer.ElementsBuffer.Count == 0)
             {
                 //lmpExecuteInfo.Show();
@@ -1321,7 +1279,7 @@ namespace AAC
         private void ClearBufferCommand()
         {
             PAC_Buffer.DeleteAll();
-            App.MainForm.PAC_lBufferCount.Text = $"0/{PAC_Buffer.ElementsBuffer.Length}";
+            Apps.MainForm.PAC_lBufferCount.Text = $"0/{PAC_Buffer.ElementsBuffer.Length}";
             new ConstAnimMove(PAC_bClearBuffer.Location.X)
                 .InitAnimFormule(PAC_bClearBuffer, Formules.QuickTransition, new(PAC_bClearBuffer.Location.Y, -26, 7), AnimationStyle.XY);
         }
@@ -1351,7 +1309,7 @@ namespace AAC
                 if (StartTbOutPutSize.Width == 771) pLabelExplorer.Location = new(604, pLabelExplorer.Location.Y);
                 int Height = tbOutput.Size.Height, Y = tbOutput.Location.Y;
                 MainData.Flags.ActiveMovingMainConsole = BooleanFlags.True;
-                int StartActivePanelExplorerX = App.MainForm.pLabelExplorer.Location.X;
+                int StartActivePanelExplorerX = Apps.MainForm.pLabelExplorer.Location.X;
                 int pAllLabelExplorerEndX = pLabelExplorer.Location.X;
                 ConstAnimMove ConstFormuleW;
                 ConstAnimMove ConstPanelExplorer;
@@ -1369,7 +1327,7 @@ namespace AAC
                             tbOutput.Size = new(StartTbOutPutSize.Width - ((Cursor.Position.X - StartCursorMovingtbOutput.X) / 30), Height);
                         }
                         if (StartCursorMovingtbOutput.X - Cursor.Position.X <= 0 && Flags.ActiveExplorerLabel.Value)
-                            App.MainForm.pLabelExplorer.Location = new(StartActivePanelExplorerX + (StartCursorMovingtbOutput.X - Cursor.Position.X) / 8, App.MainForm.pLabelExplorer.Location.Y);
+                            Apps.MainForm.pLabelExplorer.Location = new(StartActivePanelExplorerX + (StartCursorMovingtbOutput.X - Cursor.Position.X) / 8, Apps.MainForm.pLabelExplorer.Location.Y);
                     });
                 }
                 if (StartCursorMovingtbOutput.X - Cursor.Position.X >= 55)
@@ -1442,7 +1400,7 @@ namespace AAC
             lDeveloper_SAW.Text = $"SAW: <{StateAnimWindow}>";
         }
 
-        private void ActivateLOG(object sender, EventArgs e) => ConsoleCommand.ReadConsoleCommand("log");
+        private void ActivateLOG(object sender, EventArgs e) => ConsoleCommand.ReadConsoleCommand(MainData.MainCommandData.MassConsoleCommand, "log");
 
         /// <summary>
         /// Активация команды через консоль
@@ -1454,7 +1412,7 @@ namespace AAC
             string text = (tbInput.Text ?? string.Empty).Replace("\r", string.Empty).Replace("\n", string.Empty);
             if (tbInput.Size.Width > 322) TbInputChangeLineText();
             PAC_Buffer.AddNewElement(text);
-            ConsoleCommand.ReadConsoleCommand(text, tbInput);
+            ConsoleCommand.ReadConsoleCommand(MainData.MainCommandData.MassConsoleCommand, text, tbInput);
         }
 
         /// <summary>
@@ -1639,14 +1597,14 @@ namespace AAC
             {
                 ConstAnimMove ConstAnimX = new(Location.X, Screen.PrimaryScreen.Bounds.Width / 2 - Size.Width / 2, 10);
                 ConstAnimMove ConstAnimY = new(Location.Y, Screen.PrimaryScreen.Bounds.Height / 2 - Size.Height / 2, 10);
-                ConstAnimX.InitAnimFormule(App.MainForm, Formules.QuickTransition, ConstAnimY, AnimationStyle.XY);
+                ConstAnimX.InitAnimFormule(Apps.MainForm, Formules.QuickTransition, ConstAnimY, AnimationStyle.XY);
             }
         }
 
         /// <summary>
         /// Постоянный цикл обновления информации
         /// </summary>
-        public async void AlwaysUpdateWindow()
+        public async Task AlwaysUpdateWindow()
         {
             ObjLog.LOGTextAppend("Была Вызвана функция автоматического обновления данных");
 
@@ -1658,7 +1616,7 @@ namespace AAC
             {
                 while (true)
                 {
-                    if (App.MainForm.WindowState == FormWindowState.Normal)
+                    if (Apps.MainForm.WindowState == FormWindowState.Normal)
                     {
                         AllTick = ++AllTick % 200;
                         PointVolume = (int)(MainData.Divaces.ActiveDevice.AudioMeterInformation.MasterPeakValue * 100);
@@ -1690,7 +1648,7 @@ namespace AAC
 
                         // Обновление информации в панели разработчика
                         if ((bool)MainData.Settings.Developer_Mode && MainData.Flags.PanelDeveloper == BooleanFlags.True)
-                            App.MainForm.DeveloperPanelInformation();
+                            Apps.MainForm.DeveloperPanelInformation();
 
                         if (AllTick % 10 == 0)
                         {
@@ -1709,7 +1667,7 @@ namespace AAC
                         }
                     }
 
-                    Thread.Sleep(10);
+                    Thread.Sleep(20);
                 }
             });
         }

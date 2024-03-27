@@ -18,12 +18,12 @@ namespace AAC
                     cbListCustomImage.Items.Add(element.Replace($"{Directory.GetCurrentDirectory()}\\Data\\Image\\Custom\\", string.Empty));
             }
             cbListCustomImage.Text = cbListCustomImage.Items[0].ToString();
-            tbDirectoryImageFile.Text = App.MainForm.pbCustom.ImageLocation;
+            tbDirectoryImageFile.Text = Apps.MainForm.pbCustom.ImageLocation;
         }
         private void BComplete_Click(object sender, EventArgs e)
         {
             ObjLog.LOGTextAppend("Была нажата кнопка установки GIF анимации");
-            App.MainForm.pbCustom.ImageLocation = pbVisibleImage.ImageLocation;
+            Apps.MainForm.pbCustom.ImageLocation = pbVisibleImage.ImageLocation;
             Close();
         }
         private void BComplete_MouseEnter(object sender, EventArgs e)

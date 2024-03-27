@@ -45,7 +45,7 @@ namespace AAC
                 {
                     List<string> PhrasesOneCommand = [];
                     string OnePhrases = "| ";
-                    MassExplanationCommand = MainData.MainCommandData.MassVoiceCommand.Select(i => i.ExplanationCommand).ToArray();
+                    MassExplanationCommand = MainData.MainCommandData.MassVoiceCommand.Select(i => i.Explanation).ToArray();
                     for (int i = 0; i < MainData.MainCommandData.MassVoiceCommand.Length; i++)
                     {
                         foreach (string Element in MainData.MainCommandData.MassVoiceCommand[i].Phrases)
@@ -166,12 +166,12 @@ namespace AAC
         }
         private void ApplicationInfoCommandCLR_FormClosing(object sender, FormClosingEventArgs e)
         {
-            App.MainForm.UnfoldingApplication(null, null);
-            App.InformationCommand = null;
+            Apps.MainForm.UnfoldingApplication(null, null);
+            Apps.InformationCommand = null;
         }
         private void ApplicationInfoCommandCLR_Deactivate(object sender, EventArgs e)
         {
-            App.MainForm.UnfoldingApplication(null, null);
+            Apps.MainForm.UnfoldingApplication(null, null);
         }
 
         private void BCopyCommand_Click(object sender, EventArgs e)

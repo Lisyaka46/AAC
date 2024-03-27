@@ -356,7 +356,7 @@
             lOtherCountBufferPreview.AutoSize = true;
             lOtherCountBufferPreview.BorderStyle = BorderStyle.FixedSingle;
             lOtherCountBufferPreview.Font = new Font("Book Antiqua", 10F, FontStyle.Bold);
-            lOtherCountBufferPreview.Location = new Point(181, 97);
+            lOtherCountBufferPreview.Location = new Point(247, 96);
             lOtherCountBufferPreview.Name = "lOtherCountBufferPreview";
             lOtherCountBufferPreview.Size = new Size(38, 21);
             lOtherCountBufferPreview.TabIndex = 5;
@@ -364,25 +364,25 @@
             // 
             // tbOtherCountBuffer
             // 
-            tbOtherCountBuffer.LargeChange = 4;
+            tbOtherCountBuffer.AutoSize = false;
+            tbOtherCountBuffer.LargeChange = 2;
             tbOtherCountBuffer.Location = new Point(5, 97);
             tbOtherCountBuffer.Maximum = 80;
             tbOtherCountBuffer.Minimum = 4;
             tbOtherCountBuffer.Name = "tbOtherCountBuffer";
-            tbOtherCountBuffer.Size = new Size(174, 45);
-            tbOtherCountBuffer.SmallChange = 2;
+            tbOtherCountBuffer.Size = new Size(238, 20);
             tbOtherCountBuffer.TabIndex = 4;
             tbOtherCountBuffer.Tag = "countBuffer";
             tbOtherCountBuffer.TickFrequency = 8;
+            tbOtherCountBuffer.TickStyle = TickStyle.None;
             tbOtherCountBuffer.Value = 4;
-            tbOtherCountBuffer.ValueChanged += TbCountBufferChanged;
             // 
             // lOtherWarningCountBuffer
             // 
             lOtherWarningCountBuffer.BackColor = Color.IndianRed;
             lOtherWarningCountBuffer.Font = new Font("Arial Rounded MT Bold", 11.25F);
             lOtherWarningCountBuffer.ForeColor = Color.White;
-            lOtherWarningCountBuffer.Location = new Point(189, 98);
+            lOtherWarningCountBuffer.Location = new Point(255, 97);
             lOtherWarningCountBuffer.Name = "lOtherWarningCountBuffer";
             lOtherWarningCountBuffer.Size = new Size(291, 18);
             lOtherWarningCountBuffer.TabIndex = 7;

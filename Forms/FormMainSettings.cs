@@ -102,10 +102,32 @@ namespace AAC.Forms
             Size = new(800, 450);
 
 
-            if (App.MainForm.ChangeLengthBuffer == -1) App.MainForm.ChangeLengthBuffer = (int)MainData.Settings.Buffer_Count_Elements.Value;
-            tbOtherCountBuffer.Value = App.MainForm.ChangeLengthBuffer;
-            lOtherWarningCountBuffer.Size = new(App.MainForm.ChangeLengthBuffer == (int)MainData.Settings.Buffer_Count_Elements.Value ? 0 : 291, 18);
+            tbOtherCountBuffer.Value = (int)MainData.Settings.Buffer_Count_Elements.Value;
+            lOtherWarningCountBuffer.Size = new(0, 18);
             lOtherCountBufferPreview.Text = tbOtherCountBuffer.Value.ToString();
+            lOtherCountBufferPreview.DoubleClick += (sender, e) =>
+            {
+                tbOtherCountBuffer.Value = (int)MainData.Settings.Buffer_Count_Elements.Value;
+                if (lOtherWarningCountBuffer.Width > 0) new ConstAnimMove(291, 0, 10).
+                    InitAnimFormule(lOtherWarningCountBuffer, Formules.QuickTransition, new(lOtherWarningCountBuffer.Size.Height), AnimationStyle.Size);
+            };
+            tbOtherCountBuffer.ValueChanged += (sender, e) =>
+            {
+                lOtherCountBufferPreview.Text = tbOtherCountBuffer.Value.ToString();
+            };
+            tbOtherCountBuffer.MouseUp += (sender, e) =>
+            {
+                ConstAnimMove ConstantFormule = new(0, 291, 10);
+                if (tbOtherCountBuffer.Value != (int)MainData.Settings.Buffer_Count_Elements.Value)
+                {
+                    if (lOtherWarningCountBuffer.Width == 0) ConstantFormule.InitAnimFormule(lOtherWarningCountBuffer, Formules.QuickTransition, new(lOtherWarningCountBuffer.Size.Height), AnimationStyle.Size);
+                }
+                else
+                {
+                    if (lOtherWarningCountBuffer.Width > 0) ConstantFormule.Reverse().InitAnimFormule(lOtherWarningCountBuffer, Formules.QuickTransition, new(lOtherWarningCountBuffer.Size.Height), AnimationStyle.Size);
+                }
+            };
+
 
             cbHitPanel.BoolParameter = MainData.Settings.Hit_Panel;
             cbMovingBorderScreenForm.BoolParameter = MainData.Settings.Moving_Border_Screen_Form;
@@ -238,22 +260,7 @@ namespace AAC.Forms
         private void FormCloseding(object sender, FormClosingEventArgs e)
         {
             ActiveSettingsPage = SettingsPage.Null;
-            if (App.MainForm.ChangeLengthBuffer != -1)
-            {
-                MainData.Settings.SetParamOption("Count-Buffer", App.MainForm.ChangeLengthBuffer.ToString());
-            }
-        }
-
-        private void TbCountBufferChanged(object sender, EventArgs e)
-        {
-            lOtherCountBufferPreview.Text = tbOtherCountBuffer.Value.ToString();
-            App.MainForm.ChangeLengthBuffer = tbOtherCountBuffer.Value;
-            if (lOtherWarningCountBuffer.Size.Width == 0)
-            {
-                ConstAnimMove ConstantFormule = new(0, 291, 10);
-                ConstantFormule.InitAnimFormule(lOtherWarningCountBuffer, Formules.QuickTransition, new ConstAnimMove(lOtherWarningCountBuffer.Size.Height), AnimationStyle.Size);
-            }
-
+            if ((int)MainData.Settings.Buffer_Count_Elements.Value != tbOtherCountBuffer.Value) MainData.Settings.SetParamOption("Count-Buffer", tbOtherCountBuffer.Value);
         }
 
         private void SettingsCLR_Shown(object sender, EventArgs e)

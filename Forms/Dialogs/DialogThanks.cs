@@ -1,5 +1,6 @@
 ﻿using AAC.Classes;
 using static AAC.Classes.AnimationDL.Animate.AnimFormule;
+using static AAC.Startcs;
 
 namespace AAC
 {
@@ -24,7 +25,7 @@ namespace AAC
 
         public void CloseForm(object sender, EventArgs e)
         {
-            App.MainForm.UnfoldingApplication(null, null);
+            Apps.MainForm.UnfoldingApplication(null, null);
             AnimationDL.StopAnimate(AnimationDL.StyleAnimateObj.AnimFormule, lGlobalProName.Name);
             AnimationDL.StopAnimate(AnimationDL.StyleAnimateObj.AnimFormule, pThanksCreators.Name);
             Close();
@@ -42,7 +43,7 @@ namespace AAC
         {
             if (e.KeyCode == Keys.Escape)
             {
-                App.Thanks = null;
+                Apps.Thanks = null;
                 CloseForm(null, null);
             }
             else if (e.KeyCode == Keys.Space)
@@ -75,7 +76,7 @@ namespace AAC
                     while (pLabelsThanks.Location.Y + pLabelsThanks.Size.Height > lThanksThis.Size.Height)
                     {
                         i++;
-                        pLabelsThanks.Location = new Point(pLabelsThanks.Location.X, App.Thanks.pThanksCreators.Size.Height + 5 - i);
+                        pLabelsThanks.Location = new Point(pLabelsThanks.Location.X, Apps.Thanks.pThanksCreators.Size.Height + 5 - i);
                         pKvadre.Location = new(151 - (i / 7), 57);
                         lKvadreINFO.Location = new(-80 + (i / 5), 116);
                         lIcons.Location = new(3 + (i / 19), 7);

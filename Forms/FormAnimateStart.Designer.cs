@@ -68,7 +68,6 @@
             StartPosition = FormStartPosition.CenterScreen;
             TopMost = true;
             TransparencyKey = Color.FromArgb(7, 25, 83);
-            Shown += FormAnimateStart_Shown;
             ((System.ComponentModel.ISupportInitialize)pbStartingGif).EndInit();
             ResumeLayout(false);
         }

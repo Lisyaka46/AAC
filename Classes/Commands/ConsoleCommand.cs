@@ -20,7 +20,7 @@ namespace AAC.Classes.Commands
         /// </summary>
         /// <param name="ParametersValue">Параметры команды</param>
         /// <returns>Итог выполнения команды</returns>
-        public delegate CommandStateResult ExecuteCom(string[] ParametersValue);
+        public delegate Task<CommandStateResult> ExecuteCom(string[] ParametersValue);
 
         /// <summary>
         /// Имя команды
@@ -52,7 +52,7 @@ namespace AAC.Classes.Commands
             this.Name = Name;
             this.Parameters = Parameters;
             this.Explanation = Explanation ?? "Нет описания";
-            Execute ??= (parameters) => { return CommandStateResult.Completed; };
+            Execute ??= (parameters) => { return Task.FromResult(CommandStateResult.Completed); };
             this.Execute = Execute;
 
         }
@@ -94,7 +94,7 @@ namespace AAC.Classes.Commands
         /// </summary>
         /// <param name="TextCommand">Читаемая команда</param>
         /// <returns>Объект консольной команды</returns>
-        public static void ReadConsoleCommand(string TextCommand, TextBox? ConsoleText = null)
+        public static void ReadConsoleCommand(ConsoleCommand[] ConsoleCommands, string TextCommand, TextBox? ConsoleText = null)
         {
             ObjLog.LOGTextAppend($"Начинаю читать команду <{TextCommand}>");
             List<string> Parameters = [];
@@ -115,7 +115,7 @@ namespace AAC.Classes.Commands
             {
                 TextCommand = TextCommand.Replace(" ", "_").Replace("*", string.Empty).ToLower();
             }
-            ConsoleCommand? SearchCommand = MainData.MainCommandData.MassConsoleCommand.SingleOrDefault(i => i.Name.Equals(TextCommand));
+            ConsoleCommand? SearchCommand = ConsoleCommands.SingleOrDefault(i => i.Name.Equals(TextCommand));
             CommandStateResult ResultState;
             if (SearchCommand == null)
             {
@@ -123,7 +123,7 @@ namespace AAC.Classes.Commands
             }
             else
             {
-                ResultState = SearchCommand.ExecuteCommand([.. Parameters]);
+                ResultState = SearchCommand.ExecuteCommand([.. Parameters]).Result;
             }
             if (ConsoleText != null) ConsoleText.Text = string.Empty;
             ResultState.Summarize();
@@ -132,15 +132,15 @@ namespace AAC.Classes.Commands
         /// <summary>
         /// Создать выполнение команды
         /// </summary>
-        public CommandStateResult ExecuteCommand(string[] parameters)
+        public async Task<CommandStateResult> ExecuteCommand(string[] parameters)
         {
             int LengthParam = 0;
             Array.ForEach(Parameters, (i) => { if (i.Absolutly) LengthParam++; });
             if (parameters.Length >= LengthParam)
             {
                 ObjLog.LOGTextAppend($"Выполнение команды:\n<{Name}>");
-                App.MainForm.lDeveloper_ParametersCommand.Text = $"PC: <{string.Join(", ", parameters.AsEnumerable())}>";
-                return Execute.Invoke(parameters);
+                Apps.MainForm.lDeveloper_ParametersCommand.Text = $"PC: <{string.Join(", ", parameters.AsEnumerable())}>";
+                return await Execute.Invoke(parameters);
             }
             else return new CommandStateResult(ResultState.Failed,
                 $"There are not enough parameters to execute the \"{Name}\" command",

@@ -69,8 +69,8 @@ namespace AAC.Classes.Commands
                 //ConstAnimMove ConstantFormule = new(15, 15, 10);
                 //ConstantFormule.InitAnimFormule(App.MainForm.tbOutput, //!! Formules.Sinusoid, new ConstAnimMove(App.MainForm.tbOutput.Location.Y), AnimationStyle.XY);
             }
-            if (Massage.Length > 0) new Instr_AnimText(App.MainForm.tbOutput, Massage).AnimInit(true);
-            if (App.MainForm.WindowState == FormWindowState.Normal) App.MainForm.LComplete_Click(null, null);
+            if (Massage.Length > 0) new Instr_AnimText(Apps.MainForm.tbOutput, Massage).AnimInit(true);
+            if (Apps.MainForm.WindowState == FormWindowState.Normal) Apps.MainForm.LComplete_Click(null, null);
             //else if (MainData.Flags.FormActivity == Data.BooleanFlags.False && State == ResultStateCommand.Complete) MainData.MainMP3.PlaySound("Complete");
         }
     }

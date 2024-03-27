@@ -7,7 +7,7 @@ using WMPLib;
 using static AAC.Classes.MainTheme;
 using static AAC.Startcs;
 using AAC.Classes.DataClasses;
-using System.Speech.Recognition;
+using Microsoft.Speech.Recognition;
 
 namespace AAC.Classes
 {
@@ -62,75 +62,16 @@ namespace AAC.Classes
         /// </summary>
         public Data()
         {
-            MainCommandData = new(Reading.ReadConsoleCommandDataBase(), Reading.ReadVoiceCommandDataBase());
-            MainMP3 = new(10);
-            InputVoiceDevice = new(MainCommandData.MassVoiceCommand);
-            MainThemeData = new();
             Settings = new();
+            ConsoleCommand[] MCC = Reading.ReadConsoleCommandDataBase();
+            VoiceCommand[] MVC = Reading.ReadVoiceCommandDataBase();
+            MainCommandData = new(MCC, MVC);
+            MainMP3 = new(10);
+            InputVoiceDevice = new(MainCommandData, Settings.Activation_Microphone);
+            MainThemeData = new();
             Flags = new();
             AllSpecialColor = new(Settings.SpecialColor_RGB, Settings.SpecialColor_RGBCC, Settings.SpecialColor_SC, Color.Black);
             Divaces = new();
-        }
-
-        /// <summary>
-        /// Класс голосового девайса разпознающего речь
-        /// </summary>
-        public class InputVoiceCommandDevice
-        {
-            /// <summary>
-            /// Глобальный дивайс ввода голосовых команд
-            /// </summary>
-            private readonly SpeechRecognitionEngine RecordInput;
-
-            /// <summary>
-            /// Коэффициент точности распознавания голосовых фраз
-            /// </summary>
-            public static readonly float FactorAccuracyVoice = 0.6f;
-
-            /// <summary>
-            /// Встроенные голосовые фразы 
-            /// </summary>
-            public readonly Choices DefaultChoicesProgramm;
-
-            /// <summary>
-            /// Обновить данные фраз
-            /// </summary>
-            public void UpdateAllGrammars()
-            {
-                bool Activated = false;
-                if (RecordInput.AudioState == AudioState.Silence)
-                {
-                    RecordInput.RecognizeAsyncStop();
-                    Activated = true;
-                }
-                RecordInput.UnloadAllGrammars();
-
-                GrammarBuilder bulder = new();
-                bulder.Append(DefaultChoicesProgramm);
-                Grammar grammar = new(bulder);
-                RecordInput.LoadGrammarAsync(grammar);
-                if (Activated) RecordInput.RecognizeAsync(RecognizeMode.Multiple);
-            }
-
-            /// <summary>
-            /// Инициализировать объект девайса распознавающего голос
-            /// </summary>
-            /// <param name="DefaultVoiceCommand">Встроенные фразы</param>
-            /// <param name="ActivateDevice">Активировать ли распознавание</param>
-            public InputVoiceCommandDevice(VoiceCommand[] DefaultVoiceCommand, bool ActivateDevice = false)
-            {
-                //RecordInput = new();
-                //RecordInput.SetInputToDefaultAudioDevice();
-                //RecordInput.SpeechRecognized += new EventHandler<SpeechRecognizedEventArgs>(TypeCommand.CheckingVoiceCommand);
-
-                //DefaultChoicesProgramm = new(DefaultVoiceCommand.Select(i => i.Phrases).First());
-                //foreach (TypeCommand.VoiceCommand Element in DefaultVoiceCommand) DefaultChoicesProgramm.Add(Element.Phrases);
-                //GrammarBuilder bulder = new();
-                //bulder.Append(DefaultChoicesProgramm);
-                //Grammar grammar = new(bulder);
-                //RecordInput.LoadGrammar(grammar);
-                //if (ActivateDevice) RecordInput.RecognizeAsync(RecognizeMode.Multiple);
-            }
         }
 
         /// <summary>

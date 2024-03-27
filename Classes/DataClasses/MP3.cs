@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
 using WMPLib;
@@ -13,16 +14,18 @@ namespace AAC.Classes.DataClasses
     /// </summary>
     public class MP3
     {
+        private const string Dir = $"Data/Sound";
+
 
         /// <summary>
         /// Количество каналов воспроизведения
         /// </summary>
-        public int CountChannelMP { get; }
+        public readonly int CountChannelMP;
 
         /// <summary>
         /// Плеер для mp3 файлов
         /// </summary>
-        public List<WindowsMediaPlayer> DoMP3player { get; private set; }
+        private readonly List<WindowsMediaPlayer> DoMP3player;
 
         /// <summary>
         /// Свойство индекса канала плеера
@@ -42,19 +45,23 @@ namespace AAC.Classes.DataClasses
         }
 
         /// <summary>
-        /// Воспроизвести звук .mp3
+        /// Воспроизвести звук
         /// </summary>
         /// <param name="NameSound">Путь к звуковому файлу</param>
         public void PlaySound(string NameSound)
         {
             NameSound = NameSound.Replace(".mp3", string.Empty);
-            if (File.Exists($"{Directory.GetCurrentDirectory()}\\Data\\Mp3\\{NameSound}.mp3"))
+            if (File.Exists($"{Dir}/{NameSound}.mp3"))
             {
-                DoMP3player[ActivityChannelMP] = new()
+                try
                 {
-                    URL = $"{Directory.GetCurrentDirectory()}\\Data\\Mp3\\{NameSound}.mp3"
-                };
-                DoMP3player[ActivityChannelMP].controls.play();
+                    DoMP3player[ActivityChannelMP] = new()
+                    {
+                        URL = $"{Dir}/{NameSound}.mp3"
+                    };
+                    DoMP3player[ActivityChannelMP].controls.play();
+                }
+                catch { }
                 ActivityChannelMP = (ActivityChannelMP + 1) % CountChannelMP;
             }
             else

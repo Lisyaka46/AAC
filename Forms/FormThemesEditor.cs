@@ -321,8 +321,8 @@ namespace AAC.Forms
         {
             Theme NEWTHEME;
             NEWTHEME = MainData.MainThemeData.ActivateTheme;
-            App.Create.DialogCreateTheme = new(NEWTHEME);
-            App.Create.DialogCreateTheme.ShowDialog();
+            Apps.DialogCreateTheme = new(NEWTHEME);
+            Apps.DialogCreateTheme.ShowDialog();
         }
 
         private void Themes_FormClosed(object sender, FormClosedEventArgs e)
@@ -387,7 +387,7 @@ namespace AAC.Forms
         /// </summary>
         private static void UpdateAllFormsInTheme()
         {
-            App.MainForm.UpdateTheme(MainData.MainThemeData.ActivateTheme);
+            Apps.MainForm.UpdateTheme(MainData.MainThemeData.ActivateTheme);
         }
 
         /// <summary>
@@ -396,7 +396,7 @@ namespace AAC.Forms
         /// <param name="Index">Индекс элемента</param>
         private static void UpdateAllFormsInThemeIndex(int Index)
         {
-            App.MainForm.UpdateThemeIndexElement(Index);
+            Apps.MainForm.UpdateThemeIndexElement(Index);
         }
 
         /// <summary>
