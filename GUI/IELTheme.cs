@@ -53,7 +53,7 @@ namespace AAC.GUI
             if (theme != null)
             {
                 ElementName.Text = theme.Value.Name;
-                Icon.ImageLocation = theme.Value.IconDirectory;
+                //Icon.ImageLocation = theme.Value.IconDirectory;
                 Icon.BorderStyle = BorderStyle.None;
                 Icon.Refresh();
             }

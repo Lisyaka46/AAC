@@ -1,8 +1,10 @@
 ﻿using AAC.GUI;
+using AAC.Properties;
 using System;
 using static AAC.Classes.AnimationDL.Animate.AnimColor;
 using static AAC.Classes.AnimationDL.Animate.AnimFormule;
 using static AAC.Startcs;
+using AAC.Classes.DataClasses;
 
 namespace AAC.Forms
 {
@@ -170,7 +172,7 @@ namespace AAC.Forms
                 }
                 tbPAC_KeyDiactivate.Text = e.KeyCode.ToString();
                 MainData.Settings.HC_Alt_Diactivate_PAC.Value = e.KeyCode;
-                MainData.Settings.SetParamOption(MainData.Settings.HC_Alt_Diactivate_PAC.Name, tbPAC_KeyDiactivate.Text);
+                SettingsData.SetParamOption(MainData.Settings.HC_Alt_Diactivate_PAC.Name, tbPAC_KeyDiactivate.Text);
                 pPAC.Focus();
             };
             tbPAC_KeyActivate.KeyDown += (Sender, e) =>
@@ -182,7 +184,7 @@ namespace AAC.Forms
                 }
                 tbPAC_KeyActivate.Text = e.KeyCode.ToString();
                 MainData.Settings.HC_Alt_Activate_PAC.Value = e.KeyCode;
-                MainData.Settings.SetParamOption(MainData.Settings.HC_Alt_Activate_PAC.Name, tbPAC_KeyActivate.Text);
+                SettingsData.SetParamOption(MainData.Settings.HC_Alt_Activate_PAC.Name, tbPAC_KeyActivate.Text);
                 pPAC.Focus();
             };
 
@@ -260,7 +262,7 @@ namespace AAC.Forms
         private void FormCloseding(object sender, FormClosingEventArgs e)
         {
             ActiveSettingsPage = SettingsPage.Null;
-            if ((int)MainData.Settings.Buffer_Count_Elements.Value != tbOtherCountBuffer.Value) MainData.Settings.SetParamOption("Count-Buffer", tbOtherCountBuffer.Value);
+            if ((int)MainData.Settings.Buffer_Count_Elements.Value != tbOtherCountBuffer.Value) SettingsData.SetParamOption("Count-Buffer", tbOtherCountBuffer.Value);
         }
 
         private void SettingsCLR_Shown(object sender, EventArgs e)
@@ -274,7 +276,7 @@ namespace AAC.Forms
         {
             MainColorDialog.Color = pExampleAcentColor.BackColor;
             MainColorDialog.ShowDialog();
-            MainData.Settings.SetParamOption("Gradient-SpecialColor-SC", MainColorDialog.Color);
+            SettingsData.SetParamOption("Gradient-SpecialColor-SC", MainColorDialog.Color);
             pExampleAcentColor.BackColor = MainColorDialog.Color;
             MainData.AllSpecialColor.SC.ActientColorSC = MainColorDialog.Color;
         }

@@ -239,14 +239,7 @@ namespace AAC.Classes.DataClasses
             }
             static void SetValue(SettingsParameter Parameter, object Value)
             {
-                if (Parameter.Value.GetType() == typeof(Color))
-                {
-                    MatchCollection ColorMatch = ThemeData.RegexPatternColorPatamTheme().Matches((string)Value);
-                    if (Convert.ToInt32(ColorMatch[0].Value) > 255 || Convert.ToInt32(ColorMatch[1].Value) > 255 || Convert.ToInt32(ColorMatch[2].Value) > 255)
-                        Fail(Parameter.GetType().Name, nameof(Parameter), Value.ToString() ?? string.Empty);
-                    else Parameter.Value = Color.FromArgb(Convert.ToInt32(ColorMatch[0].Value), Convert.ToInt32(ColorMatch[1].Value), Convert.ToInt32(ColorMatch[2].Value));
-                }
-                else if (Parameter.Value.GetType() == typeof(int))
+                if (Parameter.Value.GetType() == typeof(int))
                 {
                     if (!MiniFunctions.Stringint(Value.ToString() ?? string.Empty)) Parameter.Value = Convert.ToInt32(Value);
                     else Fail(Parameter.Value.GetType().Name, nameof(Parameter), Value.ToString() ?? string.Empty);
@@ -308,7 +301,7 @@ namespace AAC.Classes.DataClasses
         /// <param name="Name">Имя параметра</param>
         /// <param name="NewValue">Новое значение параметра</param>
         /// <returns>Состояние выполнения действия</returns>
-        public bool SetParamOption(string Name, object NewValue)
+        public static bool SetParamOption(string Name, object NewValue)
         {
             if (File.Exists(DitectoryOptionFile))
             {

@@ -15,112 +15,86 @@ namespace AAC.Classes.DataClasses
     public partial class ThemeData
     {
         /// <summary>
-        /// Все описания параметров темы
+        /// Массив всех объектов тем в программе
         /// </summary>
-        public ThemeInfoParameter[] MassInfoParameters { get; }
+        public readonly List<Theme> MassTheme;
 
         /// <summary>
         /// Массив всех объектов тем в программе
         /// </summary>
-        public List<Theme> MassTheme { get; private set; }
+        public Theme ActivityTheme => MassTheme[ActivateThemeIndex_];
 
         /// <summary>
-        /// Активная тема в программе
+        /// Индекс активной темы
         /// </summary>
-        public Theme ActivateTheme { get; set; }
+        private int ActivateThemeIndex_ = 0;
 
         /// <summary>
-        /// Обычная тема
+        /// Активный индес темы в программе
         /// </summary>
-        public Theme Default { get; }
+        public int ActivateThemeIndex
+        {
+            get => ActivateThemeIndex_;
+            set
+            {
+                if (value >= MassTheme.Count) throw new ArgumentOutOfRangeException(nameof(value), $"Индекс параметра \"{value}\" является больше допустимого: {MassTheme.Count}");
+                ActivateThemeIndex_ = value;
+            }
+        }
 
         /// <summary>
-        /// Пустая тема
+        /// Директория файла информации всех тем программы
         /// </summary>
-        public Theme Null { get; }
+        private const string DirectoryFileTheme = "Data/Info/Theme.r1";
 
         /// <summary>
         /// Инициализировать объект информации тем
         /// </summary>
-        internal ThemeData()
+        public ThemeData()
         {
-            MassInfoParameters = ThemeInfoParameter.ReadDataBaseThemeInfo();
-            Default = new(MassInfoParameters, SystemTheme.Default);
-            Null = new(MassInfoParameters, SystemTheme.Null);
-            MassTheme = new(ReadingAllThemes(MassInfoParameters));
-            ActivateTheme = Default;
+            MassTheme =
+            [
+                new("Default", "Системная тема программы",
+                [
+                    Color.Black, Color.Black, Color.Black, Color.Black,
+                    Color.Black, Color.Black, Color.Black, Color.Black,
+                    Color.Black, Color.Black, Color.Black, Color.Black,
+                    Color.Black, Color.Black, Color.Black,
+                ]),
+            ];
+            MassTheme.AddRange(ReadingAllThemes());
         }
 
         /// <summary>
         /// Прочитать все файлы тем 
         /// </summary>
         /// <returns></returns>
-        private List<Theme> ReadingAllThemes(ThemeInfoParameter[] infoParameters)
+        private static IEnumerable<Theme> ReadingAllThemes()
         {
             ObjLog.LOGTextAppend("Программа изучает _THEME");
-            Theme theme;
-            List<Theme> list = [Default];
-            foreach (string File in Directory.GetFiles($"{Directory.GetCurrentDirectory()}\\Data\\Theme\\"))
+            if (!File.Exists(DirectoryFileTheme)) return [];
+            string[] AllLines = File.ReadAllLines(DirectoryFileTheme);
+            List<Theme> list = AllLines.Select(line =>
             {
-                if (Path.GetExtension(File).Equals("._theme"))
+                // Name%Description%1;1;1;*1;1;1;*1;1;1;*1;1;1;*1;1;1;*%!
+                MatchCollection CategoriesReadTheme = Categories().Matches(line);
+                List<Color> Colors = [];
+                MatchCollection MassColorsParams = ColorParameters().Matches(CategoriesReadTheme[2].Value);
+                Colors.AddRange(MassColorsParams.Select(i =>
                 {
-                    theme = ReadFile_theme(infoParameters, File);
-                    list.Add(theme);
-                    ObjLog.LOGTextAppend($"Прочитана тема: \"{theme.Name}\", Кол-во цветов: {theme.ObjColors.Length}");
-                    ObjLog.LOGTextAppend($"Описание темы: \"{theme.Description}\"");
-                    ObjLog.LOGTextAppend($"Директория иконки темы: \"{theme.IconDirectory}\"");
-                }
-            }
-            ObjLog.LOGTextAppend($"Всего прочитанных тем: {list.Count}");
-            return list;
+                    MatchCollection MassColorNumbers = NumbersColor().Matches(i.Value);
+                    return Color.FromArgb(Convert.ToByte(MassColorNumbers[0].Value), Convert.ToByte(MassColorNumbers[1].Value), Convert.ToByte(MassColorNumbers[2].Value));
+                }));
+                return new Theme(CategoriesReadTheme[0].Value, CategoriesReadTheme[1].Value, [.. Colors.AsEnumerable()]);
+            }).ToList();
+            return list.AsEnumerable();
         }
 
-        /// <summary>
-        /// Прочитать фаил ._theme для инициализации темы в программу
-        /// </summary>
-        /// <param name="DirectoryFile">Директория читаемого файла</param>
-        /// <returns>Theme: Тема прочитанная из файла</returns>
-        private Theme ReadFile_theme(ThemeInfoParameter[] infoParameters, string DirectoryFile)
-        {
-            StreamReader FileRead = new(DirectoryFile);
-            string TextFile = FileRead.ReadToEnd();
-            FileRead.Close();
-
-            string Name = RegexPatternNameTheme().Match(TextFile).Value.Replace("==", "=").Replace("=;", ";").Replace("NAME:", string.Empty);
-
-            string IconDirectory = RegexPatternIconTheme().Match(TextFile).Value.Replace("==", "=").Replace("=;", ";").Replace("ICON:", string.Empty).Replace(@"\\", @"\");
-
-            string Description = RegexPatternDescriptionTheme().Match(TextFile).Value.Replace("==", "=").Replace("=;", ";").Replace("DESCRIPTION:", string.Empty);
-
-            List<Color> Colors = [];
-            string[] Num;
-            foreach (Match match in RegexPatternColorPatamTheme().Matches(TextFile).Cast<Match>())
-            {
-                Num = RegexPatternColorOneRGB().Matches(match.Value).Select(i => i.Value.Replace(";", string.Empty)).ToArray();
-                ObjLog.LOGTextAppend($"0: {Num[0]} | 1: {Num[1]} | 2: {Num[2]} => L: {Num.Length}");
-                Colors.Add(Color.FromArgb(Convert.ToInt32(Num[0]), Convert.ToInt32(Num[1]), Convert.ToInt32(Num[2])));
-            }
-            return new Theme(Default.ObjColors, infoParameters, Name, DirectoryFile, IconDirectory, [.. Colors], Description);
-        }
-
-        /// <summary>
-        /// Переключить тему на обычную
-        /// </summary>
-        public void ResetDefaultTheme() => ActivateTheme = Default;
-
-        [GeneratedRegex("NAME:([^=;]|==|=;)+")]
-        private static partial Regex RegexPatternNameTheme();
-
-        [GeneratedRegex("ICON:([^=;]|==|=;)+")]
-        private static partial Regex RegexPatternIconTheme();
-
-        [GeneratedRegex("DESCRIPTION:([^=;]|==|=;)+")]
-        private static partial Regex RegexPatternDescriptionTheme();
-
-        [GeneratedRegex(@"=(([0-9]|[1-9]\d|1\d\d|[1-2][0-4]\d|[1-2][0-5][0-5]);){3}")]
-        public static partial Regex RegexPatternColorPatamTheme();
-
-        [GeneratedRegex(@"\d{1,3};")]
-        private static partial Regex RegexPatternColorOneRGB();
+        [GeneratedRegex("\\b[^%]+")]
+        private static partial Regex Categories();
+        [GeneratedRegex("\\b[^*]+")]
+        private static partial Regex ColorParameters();
+        [GeneratedRegex("\\b(\\d){1,3}")]
+        private static partial Regex NumbersColor();
     }
 }

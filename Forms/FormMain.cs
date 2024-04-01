@@ -1,4 +1,6 @@
 using AAC.Classes;
+using AAC.Classes.Commands;
+using AAC.Classes.DataClasses;
 using AAC.GUI;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
@@ -8,8 +10,6 @@ using static AAC.Classes.AnimationDL.Animate.AnimText;
 using static AAC.Classes.MainTheme;
 using static AAC.Forms_Functions;
 using static AAC.Startcs;
-using AAC.Classes.Commands;
-using AAC.Classes.DataClasses;
 
 namespace AAC
 {
@@ -24,52 +24,52 @@ namespace AAC
             /// <summary>
             /// Статус активности объекта пояснения
             /// </summary>
-            public static Flag Information { get; } = new(false);
+            public static readonly Flag Information = new(false);
 
             /// <summary>
             /// Статус активности взаимодействия с мини-панелью с помощью клавиатуры
             /// </summary>
-            public static Flag PAC_PanelAltActivate { get; } = new(false);
+            public static readonly Flag PAC_PanelAltActivate = new(false);
 
             /// <summary>
             /// Статус активности главной формы
             /// </summary>
-            public static Flag FormActivity { get; } = new(true);
+            public static readonly Flag FormActivity = new(true);
 
             /// <summary>
             /// Статус перемещения окна формы
             /// </summary>
-            public static Flag MovingApplication { get; } = new(false);
+            public static readonly Flag MovingApplication = new(false);
 
             /// <summary>
             /// Статус Активности мини-панели главной формы
             /// </summary>
-            public static Flag PAC_PanelActivate { get; } = new(false);
+            public static readonly Flag PAC_PanelActivate = new(false);
 
             /// <summary>
             /// Статус Активности клавиш на клавиатуре
             /// </summary>
-            public static Flag KeyActivity { get; } = new(false);
+            public static readonly Flag KeyActivity = new(false);
 
             /// <summary>
             /// Статус активности буфера в консольной строке
             /// </summary>
-            public static Flag BufferConsole { get; } = new(false);
+            public static readonly Flag BufferConsole = new(false);
 
             /// <summary>
             /// Статус активности панели подсказок к командам консоли
             /// </summary>
-            public static Flag ActiveHitPanelConsole { get; } = new(false);
+            public static readonly Flag ActiveHitPanelConsole = new(false);
 
             /// <summary>
             /// Статус Активности панели ярлыков
             /// </summary>
-            public static Flag ActiveExplorerLabel { get; } = new(false);
+            public static readonly Flag ActiveExplorerLabel = new(false);
 
             /// <summary>
             /// Статус Активности мини-панели настроек
             /// </summary>
-            public static Flag ActiveSettingsMiniPanel { get; } = new(false);
+            public static readonly Flag ActiveSettingsMiniPanel = new(false);
         }
 
         /// <summary>
@@ -105,7 +105,7 @@ namespace AAC
         /// <summary>
         /// Массив ярлыков
         /// </summary>
-        private ListLabel<IELLabelAccess> LabelAccess;
+        private readonly ListLabel<IELLabelAccess> LabelAccess;
 
         /// <summary>
         /// Индекс активного объекта ярлыка в PAC
@@ -120,13 +120,12 @@ namespace AAC
         /// <summary>
         /// Счётчик скролл-бара ярлыков
         /// </summary>
-        private CounterScrollBar ScrollLabels { get; set; }
-
+        private readonly CounterScrollBar ScrollLabels;
 
         /// <summary>
         /// Массив нажатых клавиш
         /// </summary>
-        private List<Keys> ControlKey { get; set; }
+        private readonly List<Keys> ControlKey;
 
         /// <summary>
         /// Инициализация главной формы программы
@@ -202,7 +201,7 @@ namespace AAC
 
 
 
-            UpdateTheme(MainData.MainThemeData.ActivateTheme);
+            UpdateTheme(MainData.MainThemeData.ActivityTheme);
             if ((bool)MainData.Settings.Activation_Microphone)
             {
                 MainData.Flags.AudioCommand = StatusFlags.Active;
@@ -417,7 +416,7 @@ namespace AAC
             IELLabelAccess? GenerateLabelAccess = Apps.DialogCreateLabel.GenerateLabelAccess(this, pAllVisualLabel);
             if (GenerateLabelAccess != null)
             {
-                Color MP = MainData.MainThemeData.ActivateTheme.ObjColors[7].ElColor;
+                Color MP = MainData.MainThemeData.ActivityTheme.Palette[7];
                 byte MPR = (byte)(MP.R + (MP.R <= 150 ? 55 : -55));
                 GenerateLabelAccess.BackColor = Color.FromArgb(MPR, MPR, MPR);
                 GenerateLabelAccess.BringToFront();
@@ -449,13 +448,13 @@ namespace AAC
 
         public void LComplete_Click(object sender, EventArgs e)
         {
-            ConstAnimColor constAnim = new(Color.White, MainData.MainThemeData.ActivateTheme.ObjColors[3].ElColor, 6);
+            ConstAnimColor constAnim = new(Color.White, MainData.MainThemeData.ActivityTheme.Palette[3], 6);
             constAnim.AnimInit(lComplete, AnimStyleColor.ForeColor);
         }
 
         public void LActiveitedSoftCommand_Click(object sender, EventArgs e)
         {
-            ConstAnimColor constAnim = new(Color.White, MainData.MainThemeData.ActivateTheme.ObjColors[3].ElColor, 2);
+            ConstAnimColor constAnim = new(Color.White, MainData.MainThemeData.ActivityTheme.Palette[3], 2);
             constAnim.AnimInit(lActiveitedSoftCommand, AnimStyleColor.ForeColor);
         }
 
@@ -699,7 +698,7 @@ namespace AAC
             {
                 lock (this)
                 {
-                    Color MP = MainData.MainThemeData.ActivateTheme.ObjColors[8].ElColor;
+                    Color MP = MainData.MainThemeData.ActivityTheme.Palette[8];
                     Label Hit = new()
                     {
                         Parent = pHitCommandConsole,
@@ -1296,7 +1295,7 @@ namespace AAC
 
         private void TbNameColorParamContains_TextChanged(object sender, EventArgs e)
         {
-            lDeveloper_ContainsTextInColorParam.Text = $"CTICP: {MainData.MainThemeData.MassInfoParameters.Select(i => i.Name).Contains(tbNameColorParamContains.Text)}";
+            lDeveloper_ContainsTextInColorParam.Text = $"CTICP: {ThemeInfoParameters.Select(i => i.Name).Contains(tbNameColorParamContains.Text)}";
         }
 
         private async void TbOutput_MouseDown(object sender, MouseEventArgs e)
@@ -1468,7 +1467,7 @@ namespace AAC
             });
         }
 
-        private void Change_MicrophoneActivate(object sender, EventArgs e) => MainData.Settings.SetParamOption("Activation-Microphone", cbSettingsVoice.Checked ? "1" : "0");
+        private void Change_MicrophoneActivate(object sender, EventArgs e) => SettingsData.SetParamOption(nameof(MainData.Settings.Activation_Microphone), cbSettingsVoice.Checked ? "1" : "0");
 
         /// <summary>
         /// Обновить Alt состояние всех кнопок PAC
@@ -1678,7 +1677,7 @@ namespace AAC
         /// <param name="theme">Тема для обновления</param>
         public void UpdateTheme(Theme theme)
         {
-            for (int i = 0; i < theme.ObjColors.Length; i++) UpdateThemeIndexElement(i);
+            for (int i = 0; i < theme.Palette.Length; i++) UpdateThemeIndexElement(i);
         }
 
         /// <summary>
@@ -1687,10 +1686,9 @@ namespace AAC
         /// <param name="Index">Индекс обновляемого элемента</param>
         public void UpdateThemeIndexElement(int Index)
         {
-            if (Index < 0 || Index >= MainData.MainThemeData.ActivateTheme.ObjColors.Length)
+            if (Index < 0 || Index >= MainData.MainThemeData.ActivityTheme.Palette.Length)
                 throw new ArgumentOutOfRangeException(nameof(Index), $"Индекс {Index} обновляемого элемента находится за границами массива цветов темы.");
-            ThemeObjColor ObjMP = MainData.MainThemeData.ActivateTheme.ObjColors[Index];
-            Color MP = ObjMP.ElColor;
+            Color MP = MainData.MainThemeData.ActivityTheme.Palette[Index];
             switch (Index)
             {
                 // Цвет для вывода в консоль текста
@@ -1800,7 +1798,7 @@ namespace AAC
                     break;
 
                 default:
-                    throw new Exception($"{ObjMP.Name} под индексом {Index} не зарегестрирован под обновление {Name}");
+                    throw new Exception($"индекс {Index} не зарегестрирован под обновление {Name}");
             }
         }
 

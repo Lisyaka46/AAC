@@ -44,7 +44,7 @@ namespace AAC.Classes
         /// <param name="indicator"> Названия выполняющего программного действия shell</param>
         public static bool ShellGUID(string indicator)
         {
-            string id_ = string.Empty;
+            string id_;
             switch (indicator)
             {
                 case "DesktopVisualTrue":

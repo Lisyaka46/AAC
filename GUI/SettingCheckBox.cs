@@ -1,4 +1,5 @@
-﻿using static AAC.Classes.DataClasses.SettingsData;
+﻿using AAC.Classes.DataClasses;
+using static AAC.Classes.DataClasses.SettingsData;
 
 namespace AAC.GUI
 {
@@ -83,7 +84,7 @@ namespace AAC.GUI
                 if (BoolParameter_ != null)
                 {
                     BoolParameter_.Value = ElementCheckBox.Checked;
-                    Startcs.MainData.Settings.SetParamOption(BoolParameter_.Name, BoolParameter_.Value);
+                    SetParamOption(BoolParameter_.Name, BoolParameter_.Value);
                     CheckedChanged?.Invoke(ElementCheckBox.Checked);
                 }
                 else throw new NullReferenceException("При изменении параметра ссылка является null");

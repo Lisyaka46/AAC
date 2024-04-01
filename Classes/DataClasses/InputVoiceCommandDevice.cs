@@ -97,8 +97,8 @@ namespace AAC.Classes.DataClasses
                     {
                         Apps.MainForm.VoiceButtonImageUpdate(StatusFlags.Active, false);
                         MainData.Flags.AudioCommand = StatusFlags.Active;
-                        Activate();
                         if (Apps.MainForm.StateAnimWindow != StateAnimateWindow.Active) MainData.MainMP3.PlaySound("Complete");
+                        Activate();
                     }
                     return Task.FromResult(CommandStateResult.Completed);
                 })

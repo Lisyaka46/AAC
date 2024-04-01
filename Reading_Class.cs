@@ -150,7 +150,7 @@ namespace AAC
                                 "Была вызвана ошибка команды <font_size> об несоответствии параметра диапазону значений"));
                         else
                         {
-                            MainData.Settings.SetParamOption("Text-Size", param[0]);
+                            SettingsData.SetParamOption(nameof(MainData.Settings.Font_Size_Console_Text), param[0]);
                             Apps.MainForm.tbOutput.Font = new Font(Apps.MainForm.tbOutput.Font.Name, Convert.ToInt32(param[0]));
                             Apps.MainForm.tbOutput.Update();
                         }

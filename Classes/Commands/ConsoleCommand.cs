@@ -13,7 +13,7 @@ namespace AAC.Classes.Commands
     /// <summary>
     /// Консольная команда
     /// </summary>
-    public class ConsoleCommand
+    public partial class ConsoleCommand
     {
         /// <summary>
         /// Делегат события выполнения команды
@@ -108,8 +108,8 @@ namespace AAC.Classes.Commands
             {
                 if (TextCommand[TextCommand.IndexOf('*') + 1] != ' ') TextCommand = TextCommand.Replace("*", "* ");
                 TextCommand = TextCommand[0..TextCommand.IndexOf('*')].Replace(" ", "_").ToLower() + TextCommand[TextCommand.IndexOf('*')..];
-                Parameters = Regex.Matches(TextCommand, @"( |\*|,)([^,]|,,)+").Select(i => i.Value[2..]).ToList();
-                TextCommand = Regex.Match(TextCommand, @"\b[^\*~!@#$<>,.\/\\?|'"";:`%^&*()\[\]{} \-=+]+\* ?").Value.ToString().Replace("*", string.Empty).Replace(" ", string.Empty);
+                Parameters = RegexParameterCommand().Matches(TextCommand).Select(i => i.Value[2..]).ToList();
+                TextCommand = RegexSortCommand().Match(TextCommand).Value.ToString().Replace("*", string.Empty).Replace(" ", string.Empty);
             }
             else // command
             {
@@ -146,5 +146,10 @@ namespace AAC.Classes.Commands
                 $"There are not enough parameters to execute the \"{Name}\" command",
                 $"Недостаточно параметров для выполнения команды \"{Name}\"");
         }
+
+        [GeneratedRegex(@"( |\*|,)([^,]|,,)+")]
+        private static partial Regex RegexParameterCommand();
+        [GeneratedRegex(@"\b[^\*~!@#$<>,.\/\\?|'"";:`%^&*()\[\]{} \-=+]+\* ?")]
+        private static partial Regex RegexSortCommand();
     }
 }

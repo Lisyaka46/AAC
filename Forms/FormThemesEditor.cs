@@ -12,42 +12,32 @@ namespace AAC.Forms
         /// <summary>
         /// Массив визуализационных объектов тем программы
         /// </summary>
-        private List<IELTheme> MassThemePanel { get; set; }
+        private readonly List<IELTheme> MassThemePanel;
 
         /// <summary>
         /// Массив визуализационных объектов параметров цвета темы
         /// </summary>
-        private IELParamColorTheme[] ParamColorTheme { get; set; }
+        private readonly IELParamColorTheme[] ParamColorTheme;
 
         /// <summary>
-        /// Тема над которой производятся действия
+        /// Индекс темы над которой производятся действия
         /// </summary>
-        private Theme? ThemeAction { get; set; }
+        private int? IndexThemeAction { get; set; }
 
         /// <summary>
         /// Тема над которой производятся действие изменение параметров цвета
         /// </summary>
-        private Theme? ThemeChangeParamColor { get; set; }
-
-        /// <summary>
-        /// Активно ли состояние изменения параметров цвета в теме
-        /// </summary>
-        private bool ActiveChangeParamColorTheme { get; set; }
-
-        /// <summary>
-        /// Состояние активности мини-панели действий над темой
-        /// </summary>
-        private bool ActiveMiniPanel { get; set; }
+        private int? IndexThemeChangeParamColor { get; set; }
 
         /// <summary>
         /// Счётчик скролл-бара параметров цвета темы
         /// </summary>
-        private CounterScrollBar CounterParamColorTheme { get; }
+        private readonly CounterScrollBar CounterParamColorTheme;
 
         /// <summary>
         /// Счётчик скролл-бара тем
         /// </summary>
-        private CounterScrollBar CounterTheme { get; }
+        private readonly CounterScrollBar CounterTheme;
 
         /// <summary>
         /// Массив поиска индексов элементов
@@ -57,15 +47,15 @@ namespace AAC.Forms
         /// <summary>
         /// Активный индекс поиска элементов
         /// </summary>
-        private int MultiSearchActiveIndex { get; set; }
+        private int? MultiSearchActiveIndex { get; set; }
 
         public FormThemesEditor()
         {
             InitializeComponent();
-            ActiveChangeParamColorTheme = false;
-            MultiSearchActiveIndex = -1;
+            IndexThemeChangeParamColor = null;
+            IndexThemeAction = null;
+            MultiSearchActiveIndex = null;
             MassThemePanel = [];
-
             foreach (Theme theme in MainData.MainThemeData.MassTheme)
             {
                 MassThemePanel.Add(new(theme, pAllElementsRegThemes, new(5, MassThemePanel.Count > 0 ? 26 * (MassThemePanel.Count + 1) + 4 : 5)));
@@ -82,10 +72,10 @@ namespace AAC.Forms
                 };
             }
 
-            ParamColorTheme = new IELParamColorTheme[MainData.MainThemeData.MassInfoParameters.Length];
-            for (int i = 0; i < MainData.MainThemeData.MassInfoParameters.Length; i++)
+            ParamColorTheme = new IELParamColorTheme[ThemeInfoParameters.Length];
+            for (int i = 0; i < ThemeInfoParameters.Length; i++)
             {
-                ParamColorTheme[i] = new(MainData.MainThemeData.MassInfoParameters[i], pAllParamColorTheme, null, i)
+                ParamColorTheme[i] = new(ThemeInfoParameters[i], pAllParamColorTheme, null, i)
                 {
                     Location = new(5, i == 0 ? 3 : 70 * i + 3)
                 };
@@ -95,11 +85,11 @@ namespace AAC.Forms
                     if (ColorCreator.ShowDialog(this) == DialogResult.OK)
                     {
                         ParamColorTheme[Index].SetParamColor(ColorCreator.Color);
-                        if (ThemeChangeParamColor.HasValue)
+                        if (IndexThemeChangeParamColor.HasValue)
                         {
-                            if (ThemeChangeParamColor.Value.Name.Equals(MainData.MainThemeData.ActivateTheme.Name))
+                            if (MainData.MainThemeData.MassTheme[IndexThemeChangeParamColor.Value].Name.Equals(MainData.MainThemeData.ActivityTheme.Name))
                             {
-                                MainData.MainThemeData.ActivateTheme.ObjColors[Index].ElColor = ColorCreator.Color;
+                                MainData.MainThemeData.ActivityTheme.Palette[Index] = ColorCreator.Color;
                                 UpdateAllFormsInThemeIndex(Index);
                             }
                         }
@@ -117,7 +107,6 @@ namespace AAC.Forms
             CounterTheme = new(MassThemePanel.Count, 9);
 
             pMiniPanel.Size = new(pMiniPanel.Width, 0);
-            ActiveMiniPanel = false;
 
             Size = new(808, 515);
             MaximumSize = Size;
@@ -173,7 +162,7 @@ namespace AAC.Forms
             bmpButtonBack.Click += (sender, e) => { DeactivateMiniPanel(); };
             bmpSaveChangeTheme.Click += (sender, e) =>
             {
-                if (ThemeChangeParamColor != null && (!ThemeAction?.Name.Equals(ThemeChangeParamColor?.Name) ?? true)) ColorManagerChange();
+                if (IndexThemeChangeParamColor != null && (!MainData.MainThemeData.MassTheme[IndexThemeAction ?? 0].Name.Equals(MainData.MainThemeData.MassTheme[IndexThemeChangeParamColor ?? 0].Name))) ColorManagerChange();
                 else ColorManagerDetect();
             };
             ButtonCloseChangeParamColor.Click += (sender, e) => { ColorManagerDetect(); };
@@ -232,7 +221,7 @@ namespace AAC.Forms
         {
             if (theme == null)
             {
-                if (ActiveMiniPanel) DeactivateMiniPanel();
+                if (IndexThemeAction.HasValue) DeactivateMiniPanel();
                 return;
             }
             if (MassMultiSearchIndex != null) MultiSearchDisactivate();
@@ -247,11 +236,10 @@ namespace AAC.Forms
                     Y + pMiniPanel.Height < Height ? Y : Height - pMiniPanel.Height);
             }
             Point RelativeLocation = LocationSet();
-            ThemeAction = theme;
 
-            if (!ActiveMiniPanel)
+            if (!IndexThemeAction.HasValue)
             {
-                ActiveMiniPanel = true;
+                IndexThemeAction = MainData.MainThemeData.MassTheme.IndexOf(theme.Value);
                 pMiniPanel.Location = new(RelativeLocation.X, RelativeLocation.Y);
                 ConstAnimMove Anim = new(0, 146, 13);
                 new ConstAnimMove(pMiniPanel.Width).InitAnimFormule(pMiniPanel, Formules.QuickTransition, Anim, AnimationStyle.Size);
@@ -267,9 +255,9 @@ namespace AAC.Forms
             if (theme.Value.Name.Equals("Default")) ButtonDeleteTheme.BackgroundImage = Image.FromFile($"{Directory.GetCurrentDirectory()}/Data/Image/DisactiveTrashCan.png");
             else ButtonDeleteTheme.BackgroundImage = Image.FromFile($"{Directory.GetCurrentDirectory()}/Data/Image/ActiveTrashCan.png");
             ButtonDeleteTheme.Enabled = !theme.Value.Name.Equals("Default");
-            bSetActiveTheme.BackColor = theme.Value.Name.Equals(MainData.MainThemeData.ActivateTheme.Name) ? Color.FromArgb(255, 120, 97) : Color.FromArgb(255, 160, 137);
-            if (ThemeChangeParamColor == null) bmpSaveChangeTheme.Text = "Менеджер цветов темы";
-            else if (theme.Value.Name.Equals(ThemeChangeParamColor.Value.Name)) bmpSaveChangeTheme.Text = "Сохранить палитру цветов";
+            bSetActiveTheme.BackColor = theme.Value.Name.Equals(MainData.MainThemeData.ActivityTheme.Name) ? Color.FromArgb(255, 120, 97) : Color.FromArgb(255, 160, 137);
+            if (IndexThemeChangeParamColor == null) bmpSaveChangeTheme.Text = "Менеджер цветов темы";
+            else if (theme.Value.Name.Equals(MainData.MainThemeData.MassTheme[IndexThemeChangeParamColor.Value].Name)) bmpSaveChangeTheme.Text = "Сохранить палитру цветов";
             else bmpSaveChangeTheme.Text = "Переназначить тему";
         }
 
@@ -278,7 +266,7 @@ namespace AAC.Forms
         /// </summary>
         public void DeactivateMiniPanel()
         {
-            ActiveMiniPanel = false;
+            IndexThemeAction = null;
             ConstAnimMove ConstantFormule = new(pMiniPanel.Height, 0, 9);
             new ConstAnimMove(pMiniPanel.Width).InitAnimFormule(pMiniPanel, Formules.QuickTransition, ConstantFormule, AnimationStyle.Size);
             MainData.Flags.MiniPanelpMiniPanelActive = BooleanFlags.False;
@@ -290,7 +278,7 @@ namespace AAC.Forms
         /// <param name="Index">Индекс скрола</param>
         private void ScrollParamColor(int Index)
         {
-            if (ActiveMiniPanel) DeactivateMiniPanel();
+            if (IndexThemeAction.HasValue) DeactivateMiniPanel();
             int Y = 70 - 70 / CounterParamColorTheme.TrafficShare * Index;
             ConstAnimMove ConstantFormule = new(pAllParamColorTheme.Location.Y, Y, 14);
             new ConstAnimMove(pAllParamColorTheme.Location.X).InitAnimFormule(pAllParamColorTheme,
@@ -319,18 +307,18 @@ namespace AAC.Forms
 
         private void BCreateNewTheme_Click(object sender, EventArgs e)
         {
-            Theme NEWTHEME;
-            NEWTHEME = MainData.MainThemeData.ActivateTheme;
+            /*Theme NEWTHEME;
+            NEWTHEME = MainData.MainThemeData.ActivityTheme;
             Apps.DialogCreateTheme = new(NEWTHEME);
-            Apps.DialogCreateTheme.ShowDialog();
+            Apps.DialogCreateTheme.ShowDialog();*/
         }
 
         private void Themes_FormClosed(object sender, FormClosedEventArgs e)
         {
-            if (ActiveChangeParamColorTheme && ThemeAction != null)
+            if (IndexThemeChangeParamColor.HasValue && IndexThemeAction.HasValue)
             {
-                SaveThemeInFile(ThemeAction);
-                if (ActiveChangeParamColorTheme) ActiveChangeParamColorTheme = false;
+                SaveThemeInFile(MainData.MainThemeData.MassTheme[IndexThemeAction.Value]);
+                IndexThemeChangeParamColor = null;
             }
             //foreach (ELIlustrationTheme Element in MassThemePanel) Element.MainPanelTheme.Dispose();
             MainData.Flags.MiniPanelpMiniPanelActive = BooleanFlags.False;
@@ -341,16 +329,15 @@ namespace AAC.Forms
         /// </summary>
         private void ColorManagerDetect()
         {
-            if (ThemeAction == null) return;
-            ThemeChangeParamColor = ActiveChangeParamColorTheme ? null : ThemeAction;
-            if (ActiveChangeParamColorTheme && MassMultiSearchIndex != null) MultiSearchDisactivate();
-            NameTheme.Text = ThemeChangeParamColor?.Name ?? string.Empty;
+            if (IndexThemeAction == null) return;
+            IndexThemeChangeParamColor = IndexThemeChangeParamColor.HasValue ? null : IndexThemeAction;
+            if (IndexThemeChangeParamColor.HasValue && MassMultiSearchIndex != null) MultiSearchDisactivate();
+            NameTheme.Text = MainData.MainThemeData.MassTheme[IndexThemeChangeParamColor ?? 0].Name ?? string.Empty;
             for (int i = 0; i < ParamColorTheme.Length; i++)
-                ParamColorTheme[i].SetParamColor(ActiveChangeParamColorTheme ? null : ThemeChangeParamColor?.ObjColors[i].ElColor);
-            ConstAnimMove ConstantFormule = new(pAllRedactorParamColorTheme.Location.X, ActiveChangeParamColorTheme ? -560 : 209, 70);
+                ParamColorTheme[i].SetParamColor(IndexThemeChangeParamColor.HasValue ? null : MainData.MainThemeData.MassTheme[IndexThemeChangeParamColor ?? 0].Palette[i]);
+            ConstAnimMove ConstantFormule = new(pAllRedactorParamColorTheme.Location.X, IndexThemeChangeParamColor.HasValue ? -560 : 209, 70);
             ConstantFormule.InitAnimFormule(pAllRedactorParamColorTheme, Formules.QuickTransition,
                 new ConstAnimMove(pAllRedactorParamColorTheme.Location.Y), AnimationStyle.XY);
-            ActiveChangeParamColorTheme = !ActiveChangeParamColorTheme;
             DeactivateMiniPanel();
         }
 
@@ -359,10 +346,10 @@ namespace AAC.Forms
         /// </summary>
         private void ColorManagerChange()
         {
-            if (!ActiveChangeParamColorTheme) return;
-            ThemeChangeParamColor = ThemeAction;
-            NameTheme.Text = ThemeChangeParamColor?.Name ?? string.Empty;
-            for (int i = 0; i < ParamColorTheme.Length; i++) ParamColorTheme[i].SetParamColor(ThemeChangeParamColor?.ObjColors[i].ElColor);
+            if (!IndexThemeChangeParamColor.HasValue) return;
+            IndexThemeChangeParamColor = IndexThemeAction;
+            NameTheme.Text = MainData.MainThemeData.MassTheme[IndexThemeChangeParamColor ?? 0].Name;
+            for (int i = 0; i < ParamColorTheme.Length; i++) ParamColorTheme[i].SetParamColor(MainData.MainThemeData.MassTheme[IndexThemeChangeParamColor ?? 0].Palette[i]);
             DeactivateMiniPanel();
         }
 
@@ -371,13 +358,13 @@ namespace AAC.Forms
         /// </summary>
         private void SetActiveTheme()
         {
-            if (ThemeAction.HasValue)
+            if (IndexThemeAction.HasValue)
             {
-                MainData.MainThemeData.ActivateTheme = ThemeAction.Value;
-                ObjLog.LOGTextAppend($"CHANGE_THEME: \"{MainData.MainThemeData.ActivateTheme.Name}\" == \"{ThemeAction.Value.Name}\"");
-                MainData.Settings.SetParamOption("Theme-Activate", ThemeAction.Value.Name);
+                MainData.MainThemeData.ActivateThemeIndex = IndexThemeAction.Value;
+                ObjLog.LOGTextAppend($"CHANGE_THEME: \"{MainData.MainThemeData.ActivityTheme.Name}\" == \"{MainData.MainThemeData.MassTheme[IndexThemeAction.Value].Name}\"");
+                SettingsData.SetParamOption("Theme-Activate", MainData.MainThemeData.ActivityTheme.Name);
                 UpdateAllFormsInTheme();
-                ThemeAction = null;
+                IndexThemeAction = null;
             }
             DeactivateMiniPanel();
         }
@@ -387,7 +374,7 @@ namespace AAC.Forms
         /// </summary>
         private static void UpdateAllFormsInTheme()
         {
-            Apps.MainForm.UpdateTheme(MainData.MainThemeData.ActivateTheme);
+            Apps.MainForm.UpdateTheme(MainData.MainThemeData.ActivityTheme);
         }
 
         /// <summary>
@@ -406,43 +393,14 @@ namespace AAC.Forms
         /// <returns>Сохранилась ли тема или нет</returns>
         public bool SaveThemeInFile(Theme? SaveTheme)
         {
-            if (SaveTheme == null) return false;
+            /*if (SaveTheme == null) return false;
             if (SaveTheme.Value.FileDirectory?.Equals(string.Empty) ?? true) return false;
-            Color LOGColor = SaveTheme.Value.ObjColors[0].ElColor;
-            string NameFile = SaveTheme.Value.FileDirectory;
+            Color LOGColor = SaveTheme.Value.Palette[0];
+            //string NameFile = SaveTheme.Value.FileDirectory;
             ObjLog.LOGTextAppend($"Имя сохраняемой темы: {SaveTheme.Value.Name}");
             ObjLog.LOGTextAppend($"Директория файла: {NameFile}");
-            ObjLog.LOGTextAppend($"Цвет BOCT [0]: R:{LOGColor.R}, G:{LOGColor.G}, B:{LOGColor.B}");
+            ObjLog.LOGTextAppend($"Цвет BOCT [0]: R:{LOGColor.R}, G:{LOGColor.G}, B:{LOGColor.B}");*/
             return true;
-        }
-
-        /// <summary>
-        /// Создать новый файл темы после создания
-        /// </summary>
-        /// <param name="CreateTheme">Тема из которой будут браться данные</param>
-        /// <param name="NameFile">Имя создаваемого файла</param>
-        public static void CreateNewFileTheme(Theme CreateTheme, string NameFile)
-        {
-            if (!NameFile.Contains("\\\\")) NameFile = NameFile.Replace("\\", "\\\\");
-            Color? color;
-            FileStream fs = new(NameFile, FileMode.OpenOrCreate, FileAccess.Write, FileShare.ReadWrite);
-            using StreamWriter FileWrite = new(fs);
-            FileWrite.WriteLine("NAMEFILE:" + NameFile.Replace(";", "=;").Replace("=", "==") + ";");
-            FileWrite.WriteLine("NAME:" + CreateTheme.Name.Replace(";", "=;").Replace("=", "==") + ";");
-            FileWrite.WriteLine("DESCRIPTION:" + CreateTheme.Description.Replace(";", "=;").Replace("=", "==") + ";");
-            FileWrite.WriteLine("ICON{" + CreateTheme.IconDirectory.Replace("\\", "\\\\").Replace(";", "=;").Replace("=", "==") + ";");
-            FileWrite.WriteLine("THEME:\n");
-            for (int i = 0; i < MainData.MainThemeData.MassInfoParameters.Length; i++)
-            {
-                color = CreateTheme.ObjColors[i].ElColor;
-                if (color != null) FileWrite.WriteLine($"={color.Value.R};{color.Value.G};{color.Value.B};");
-            }
-            FileWrite.Write("}");
-            FileWrite.Close();
-        }
-
-        private void BmpDeleteTheme_Click(object sender, EventArgs e)
-        {
         }
 
         private void BpmpChangedThemeInfo_Click(object sender, EventArgs e)
@@ -517,12 +475,12 @@ namespace AAC.Forms
         /// </summary>
         private void MultiSearchDetectUp()
         {
-            if (MassMultiSearchIndex != null)
+            if (MassMultiSearchIndex != null && MultiSearchActiveIndex.HasValue)
             {
                 if (MultiSearchActiveIndex < MassMultiSearchIndex.Length - 1) MultiSearchActiveIndex++;
                 MultiSearchCounter.Text = $"{MultiSearchActiveIndex + 1}/{MassMultiSearchIndex.Length}";
 
-                ScrollSearchDetect(MassMultiSearchIndex[MultiSearchActiveIndex]);
+                ScrollSearchDetect(MassMultiSearchIndex[MultiSearchActiveIndex.Value]);
             }
             else MultiSearchDisactivate();
         }
@@ -532,12 +490,12 @@ namespace AAC.Forms
         /// </summary>
         private void MultiSearchDetectDown()
         {
-            if (MassMultiSearchIndex != null)
+            if (MassMultiSearchIndex != null && MultiSearchActiveIndex.HasValue)
             {
                 if (MultiSearchActiveIndex > 0) MultiSearchActiveIndex--;
                 MultiSearchCounter.Text = $"{MultiSearchActiveIndex + 1}/{MassMultiSearchIndex.Length}";
 
-                ScrollSearchDetect(MassMultiSearchIndex[MultiSearchActiveIndex]);
+                ScrollSearchDetect(MassMultiSearchIndex[MultiSearchActiveIndex.Value]);
             }
             else MultiSearchDisactivate();
         }
@@ -566,7 +524,7 @@ namespace AAC.Forms
                     Formules.QuickTransition, ConstantFormule, AnimationStyle.Size);
                 MultiSearchActiveIndex = 0;
                 MultiSearchCounter.Text = $"{MultiSearchActiveIndex + 1}/{MassMultiSearchIndex.Length}";
-                ScrollSearchDetect(MassMultiSearchIndex[MultiSearchActiveIndex]);
+                ScrollSearchDetect(MassMultiSearchIndex[MultiSearchActiveIndex.Value]);
             }
         }
 

@@ -70,25 +70,21 @@ namespace AAC
             };
             bListDown.Click += (sender, e) =>
             {
-                if (Index > 0)
-                {
-                    Index--;
-                    UpdateInformationCommands();
-                }
+                if (Index == 0) return;
+                Index--;
+                UpdateInformationCommands();
             };
             bListUp.Click += (sender, e) =>
             {
-                if (Index < Commands.Length - 1)
-                {
-                    Index++;
-                    UpdateInformationCommands();
-                }
+                if (Index == Commands.Length - 1) return;
+                Index++;
+                UpdateInformationCommands();
             };
             bCopyCommand.Click += (sender, e) =>
             {
                 Clipboard.SetText(lExampleWriteCommand.Text);
-                ConstAnimColor constAnimColor = new(Color.White, Color.Black, 4);
-                constAnimColor.AnimInit(lInfoComplete, AnimStyleColor.ForeColor);
+                ConstAnimColor constAnimColor = new(Color.Green, Color.White, 4);
+                constAnimColor.AnimInit(lExampleWriteCommand, AnimStyleColor.ForeColor);
             };
             tbSearch.Enter += (sender, e) =>
             {

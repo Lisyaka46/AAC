@@ -54,10 +54,5 @@ namespace AAC.Classes
         /// Диалоговое окно создания ярлыка CLR
         /// </summary>
         public DialogCreateLabel DialogCreateLabel = null;
-
-        /// <summary>
-        /// Диалоговое окно редактирования и создания темы
-        /// </summary>
-        public DialogCreateTheme DialogCreateTheme = null;
     }
 }
