@@ -26,12 +26,12 @@ namespace AAC
             /*Описание всех консольных, встроенных команд*/ {
                 return
                 [
-                    new ConsoleCommand("settings", [], "Открывает глобальные настройки", (param) =>
+                    new ConsoleCommand("settings", null, "Открывает глобальные настройки", (param) =>
                     {
                         Apps.MainForm.BSettings_Click(null, null);
                         return Task.FromResult(CommandStateResult.Completed);
                     }),
-                    new ConsoleCommand("clear", [], "Очистка выводимых данных", (param) =>
+                    new ConsoleCommand("clear", null, "Очистка выводимых данных", (param) =>
                     {
                         ObjLog.LOGTextAppend($"Была распознана очистка консоли <tbOutput> (Командой clear)");
                         AnimationDL.StopAnimate(AnimationDL.StyleAnimateObj.AnimText, "tbOutput");
@@ -42,12 +42,12 @@ namespace AAC
                     {
                         return Task.FromResult(new CommandStateResult(ResultState.Complete, $">>> {param[0]}\n", string.Empty));
                     }),
-                    new ConsoleCommand("reboot", [], "Перезагружает программу", (param) =>
+                    new ConsoleCommand("reboot", null, "Перезагружает программу", (param) =>
                     {
                         Application.Restart();
                         return Task.FromResult(CommandStateResult.Completed);
                     }),
-                    new ConsoleCommand("close", [], "Закрывает программу", (param) =>
+                    new ConsoleCommand("close", null, "Закрывает программу", (param) =>
                     {
                         Environment.Exit(0);
                         return Task.FromResult(CommandStateResult.Completed);
@@ -129,7 +129,7 @@ namespace AAC
                         }
                         return Task.FromResult(CommandStateResult.Completed);
                     }),
-                    new ConsoleCommand("emptytrash", [], "Очищает корзину", (param) =>
+                    new ConsoleCommand("emptytrash", null, "Очищает корзину", (param) =>
                     {
                         Instr_AnimText animText;
                         ObjLog.LOGTextAppend($"Была вызвана команда очистки корзины");
@@ -240,7 +240,7 @@ namespace AAC
                                 $"Было вызвано исключение об отсутствии директории для ярлыка <{param[1]}>",
                                 $">>> Failed. <{param[1]}> not is directory\n"));
                     }),
-                    new ConsoleCommand("help", [], "Открывает окно описания всех команд доступных в программе", (param) =>
+                    new ConsoleCommand("help", null, "Открывает окно описания всех команд доступных в программе", (param) =>
                     {
                         try
                         {
@@ -272,7 +272,7 @@ namespace AAC
                                 $"Было вызвано исключение об отсутствии <{param[0]}.bat> в директории BAT.FILE"));
                         return Task.FromResult(CommandStateResult.Completed);
                     }),
-                    new ConsoleCommand("log", [], "Открывает окно журнала сообщений программы", (param) =>
+                    new ConsoleCommand("log", null, "Открывает окно журнала сообщений программы", (param) =>
                     {
                         try
                         {
@@ -289,7 +289,7 @@ namespace AAC
                         Apps.Log.WindowState = FormWindowState.Normal;
                         return Task.FromResult(CommandStateResult.Completed);
                     }),
-                    new ConsoleCommand("save_log", [], "Сохраняет сообщения журнала в отдельный файл TXT", (param) =>
+                    new ConsoleCommand("save_log", null, "Сохраняет сообщения журнала в отдельный файл TXT", (param) =>
                     {
                         ObjLog.LOGTextAppend($"Была вызвана команда сохранения информации журнала");
                         System.IO.File.WriteAllLines($"Data/Log/{DateTime.Now:HH.mm.ss}.txt", ObjLog.MassLogElements.Select(i => i.Text));
@@ -345,7 +345,7 @@ namespace AAC
                                     "Было вызвано исключение из-за не цифрового параметра"));
                         }
                     }),
-                    new ConsoleCommand("colored", [], "Открывает окно редактора цветовых палитр", (param) =>
+                    new ConsoleCommand("colored", null, "Открывает окно редактора цветовых палитр", (param) =>
                     {
                         try
                         {
@@ -356,9 +356,15 @@ namespace AAC
                         Apps.ThemesCreated.Show();
                         return Task.FromResult(CommandStateResult.Completed);
                     }),
-                    new ConsoleCommand("new_label", [], "Открывает окно редактора создания нового ярлыка программы", (param) =>
+                    new ConsoleCommand("new_label", null, "Открывает окно редактора создания нового ярлыка программы", (param) =>
                     {
                         Apps.MainForm.GenerateLabel();
+                        return Task.FromResult(CommandStateResult.Completed);
+                    }),
+                    new ConsoleCommand("block_computer", null, "Блокирует компьютер", (param) =>
+                    {
+                        if (Apps.MainForm.StateAnimWindow == StateAnimateWindow.Active) Apps.MainForm.FoldingMoveApplication();
+                        DLLMethods.LockWorkStation();
                         return Task.FromResult(CommandStateResult.Completed);
                     }),
                 ];

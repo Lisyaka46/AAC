@@ -35,7 +35,7 @@ namespace AAC.Classes.Commands
         /// <summary>
         /// Параметры команды
         /// </summary>
-        public readonly Parameter[] Parameters;
+        public readonly Parameter[]? Parameters;
 
         /// <summary>
         /// Действие которое выполняет команда
@@ -47,7 +47,7 @@ namespace AAC.Classes.Commands
         /// </summary>
         /// <param name="Name">Имя</param>
         /// <param name="Parameters">Параметры команды</param>
-        public ConsoleCommand(string Name, Parameter[] Parameters, string? Explanation, ExecuteCom? Execute)
+        public ConsoleCommand(string Name, Parameter[]? Parameters, string? Explanation, ExecuteCom? Execute)
         {
             this.Name = Name;
             this.Parameters = Parameters;
@@ -64,7 +64,7 @@ namespace AAC.Classes.Commands
         public string WritingCommandAll()
         {
             string Output = WritingCommandName();
-            if (Parameters.Length > 0) Output += $"* <{string.Join(", <", Parameters.Select(i => $"{i.Name}{(i.Absolutly ? string.Empty : "?")}>"))}";
+            if (Parameters?.Length > 0) Output += $"* <{string.Join(", <", Parameters.Select(i => $"{i.Name}{(i.Absolutly ? string.Empty : "?")}>"))}";
             return Output;
         }
 
@@ -81,7 +81,7 @@ namespace AAC.Classes.Commands
         public string[] WritingCommandParameters()
         {
             List<string> Output = [];
-            if (Parameters.Length > 0)
+            if (Parameters?.Length > 0)
             {
                 IEnumerable<string> ParameterNames = Parameters.Select(I => I.Name + ">");
                 Output.Add($"{string.Join(", <", ParameterNames)}");
@@ -132,11 +132,11 @@ namespace AAC.Classes.Commands
         /// <summary>
         /// Создать выполнение команды
         /// </summary>
-        public async Task<CommandStateResult> ExecuteCommand(string[] parameters)
+        public async Task<CommandStateResult> ExecuteCommand(string[]? parameters)
         {
             int LengthParam = 0;
-            Array.ForEach(Parameters, (i) => { if (i.Absolutly) LengthParam++; });
-            if (parameters.Length >= LengthParam)
+            if (Parameters != null) Array.ForEach(Parameters, (i) => { if (i.Absolutly) LengthParam++; });
+            if (parameters?.Length >= LengthParam)
             {
                 ObjLog.LOGTextAppend($"Выполнение команды:\n<{Name}>");
                 Apps.MainForm.lDeveloper_ParametersCommand.Text = $"PC: <{string.Join(", ", parameters.AsEnumerable())}>";
