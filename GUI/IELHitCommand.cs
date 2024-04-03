@@ -97,9 +97,18 @@ namespace AAC.GUI
             Font = new("Arial", 9.75f, FontStyle.Bold);
             BorderStyle = BorderStyle.FixedSingle;
             Cursor = Cursors.Hand;
-            TextElement.MouseEnter += (sender, e) => BackColor = ActiveColorComponent;
-            TextElement.MouseLeave += (sender, e) => BackColor = DiactivateColorComponent;
+            TextElement.MouseEnter += (sender, e) =>
+            {
+                BackColor = ActiveColorComponent;
+                TextElement.BackColor = ActiveColorComponent;
+            };
+            TextElement.MouseLeave += (sender, e) =>
+            {
+                BackColor = DiactivateColorComponent;
+                TextElement.BackColor = DiactivateColorComponent;
+            };
             TextElement.Click += (sender, e) => ClickActivateElement?.Invoke();
+            Click += (sender, e) => ClickActivateElement?.Invoke();
             TextElement.SizeChanged += (sender, e) => Size = new(TextElement.Width, TextElement.Height + 2);
         }
 
@@ -119,23 +128,41 @@ namespace AAC.GUI
             ElementText = Text;
             this.Parent = Parent;
             TextElement.TextAlign = ContentAlignment.MiddleCenter;
+            TextElement.ForeColor = Color.White;
             Font = new("Arial", 9.75f, FontStyle.Bold);
             BorderStyle = BorderStyle.FixedSingle;
             Cursor = Cursors.Hand;
-            TextElement.MouseEnter += (sender, e) => BackColor = ActiveColorComponent;
-            TextElement.MouseLeave += (sender, e) => BackColor = DiactivateColorComponent;
+            TextElement.MouseEnter += (sender, e) =>
+            {
+                BackColor = ActiveColorComponent;
+                TextElement.BackColor = ActiveColorComponent;
+            };
+            TextElement.MouseLeave += (sender, e) =>
+            {
+                BackColor = DiactivateColorComponent;
+                TextElement.BackColor = DiactivateColorComponent;
+            };
             TextElement.Click += (sender, e) => ClickActivateElement?.Invoke();
+            Click += (sender, e) => ClickActivateElement?.Invoke();
             TextElement.SizeChanged += (sender, e) => Size = new(TextElement.Width, TextElement.Height + 2);
         }
 
         /// <summary>
         /// Установить активирующий цвет на элемент
         /// </summary>
-        public void ActivateColor() => BackColor = ActiveColorComponent;
+        public void ActivateColor()
+        {
+            BackColor = ActiveColorComponent;
+            TextElement.BackColor = ActiveColorComponent;
+        }
 
         /// <summary>
         /// Установить не активный цвет на элемент
         /// </summary>
-        public void DiactivateColor() => BackColor = DiactivateColorComponent;
+        public void DiactivateColor()
+        {
+            BackColor = DiactivateColorComponent;
+            TextElement.BackColor = DiactivateColorComponent;
+        }
     }
 }

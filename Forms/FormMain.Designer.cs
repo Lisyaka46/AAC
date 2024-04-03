@@ -1017,7 +1017,7 @@
             // 
             // pHitCommandConsole
             // 
-            pHitCommandConsole.BackColor = Color.DarkGray;
+            pHitCommandConsole.BackColor = Color.Black;
             pHitCommandConsole.BorderStyle = BorderStyle.FixedSingle;
             pHitCommandConsole.Location = new Point(271, 526);
             pHitCommandConsole.Name = "pHitCommandConsole";

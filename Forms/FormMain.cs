@@ -653,6 +653,10 @@ namespace AAC
                         }
                     }
                     break;
+                default:
+                    if (tbInput.TextLength > 0) IndexingHitCommands(Regex.Escape(tbInput.Text.Replace(' ', '_')));
+                    else HitPanelDiactivate();
+                    break;
             }
         }
 
@@ -740,7 +744,6 @@ namespace AAC
                 HitPanelDiactivate();
                 return;
             }
-            IndexingHitCommands(Regex.Escape(tbInput.Text.Replace(' ', '_')));
         }
 
         //
@@ -749,81 +752,67 @@ namespace AAC
             string[] HitCommandText = [.. MainData.MainCommandData.MassConsoleCommand.Select((i) => { return i.WritingCommandName(); })];
             HitCommandText = [.. HitCommandText.Where((i) => { return i.Contains(Text, StringComparison.CurrentCultureIgnoreCase); })];
             int MaxWigth = 0;
-            Task.Run(async () =>
+            ObjLog.LOGTextAppend($"{LabelHitCommand.Count} - {HitCommandText.Length}");
+            if (LabelHitCommand.Count < HitCommandText.Length)
             {
-                if (LabelHitCommand.Count < HitCommandText.Length)
+                for (int i = 0; i < HitCommandText.Length; i++)
                 {
-                    await Task.Run(() =>
+                    if (i < LabelHitCommand.Count)
                     {
-                        for (int i = 0; i < HitCommandText.Length; i++)
-                        {
-                            if (i < LabelHitCommand.Count)
-                            {
-                                LabelHitCommand[i].ElementText = HitCommandText[i];
-                                if (LabelHitCommand[i].Width > MaxWigth) MaxWigth = LabelHitCommand[i].Width;
-                                LabelHitCommand[i].Visible = true;
-                            }
-                            else
-                            {
-                                LabelHitCommand.Add(new(pHitCommandConsole, MainData.MainThemeData.ActivityTheme.Palette[8].ToKnownColor(), i + 1, HitCommandText[i])
-                                {
-                                    Location = new(3, i == 0 ? 2 : (i * 18) + 2),
-                                    Visible = true
-                                });
-                                if (LabelHitCommand[^1].Width > MaxWigth) MaxWigth = LabelHitCommand[^1].Width;
-                            }
-                        }
-                    });
-                }
-                else if (LabelHitCommand.Count > HitCommandText.Length)
-                {
-                    await Task.Run(() =>
+                        LabelHitCommand[i].ElementText = HitCommandText[i];
+                        if (LabelHitCommand[i].Width > MaxWigth) MaxWigth = LabelHitCommand[i].Width;
+                        LabelHitCommand[i].Visible = true;
+                    }
+                    else
                     {
-                        for (int i = 0; i < LabelHitCommand.Count; i++)
+                        IELHitCommand Hit = new(pHitCommandConsole, MainData.MainThemeData.ActivityTheme.Palette[8].ToKnownColor(), LabelHitCommand.Count + 1, HitCommandText[i])
                         {
-                            if (i < HitCommandText.Length)
-                            {
-                                LabelHitCommand[i].ElementText = HitCommandText[i];
-                                if (LabelHitCommand[i].Width > MaxWigth) MaxWigth = LabelHitCommand[i].Width;
-                                LabelHitCommand[i].Visible = true;
-                            }
-                            else LabelHitCommand[i].Visible = false;
-                        }
-                    });
-                }
-                else
-                {
-                    await Task.Run(() =>
-                    {
-                        for (int i = 0; i < LabelHitCommand.Count; i++)
+                            Location = new(2, LabelHitCommand.Count == 0 ? 2 : 2 + (LabelHitCommand.Count * 18) + 2 * LabelHitCommand.Count),
+                            Visible = true
+                        };
+                        Hit.ClickActivateElement += () =>
                         {
-                            LabelHitCommand[i].ElementText = HitCommandText[i];
-                            if (LabelHitCommand[i].Width > MaxWigth) MaxWigth = LabelHitCommand[i].Width;
-                            LabelHitCommand[i].Visible = true;
-                        }
-                    });
+                            tbInput.Text = Hit.ElementText;
+                            tbInput.SelectionStart = tbInput.TextLength;
+                            HitPanelDiactivate();
+                        };
+                        LabelHitCommand.Add(Hit);
+                        if (LabelHitCommand[^1].Width > MaxWigth) MaxWigth = LabelHitCommand[^1].Width;
+                    }
                 }
-                ObjLog.LOGTextAppend($"{LabelHitCommand.Count}");
-                if (LabelHitCommand.Count > 0) HitPanelActivate(MaxWigth);
-                else HitPanelDiactivate();
-            });
-        }
-
-        /// <summary>
-        /// Активировать панель подсказок к командам
-        /// </summary>
-        private void HitPanelActivate(int MaxWigth)
-        {
-            if (!FormFlags.ActiveHitPanelConsole.Value)
-            {
-                pHitCommandConsole.Size = new(MaxWigth + 9, 0);
-                pHitCommandConsole.Location = new(tbInput.Location.X + tbInput.Size.Width - MaxWigth - 9, tbInput.Location.Y + tbInput.Size.Height + 13);
-                FormFlags.ActiveHitPanelConsole.Value = true;
             }
-            int Offset = pHitCommandConsole.Location.Y + LabelHitCommand[^1].Location.Y + LabelHitCommand[^1].Size.Height;
-            ConstAnimMove ConstClosePanelHitY = new(pHitCommandConsole.Location.Y, Offset + (tbInput.Location.Y - Offset) - (LabelHitCommand[^1].Location.Y + LabelHitCommand[^1].Size.Height) - 3, 6);
-            ConstAnimMove ConstClosePanelHitH = new(pHitCommandConsole.Size.Height, LabelHitCommand[^1].Location.Y + LabelHitCommand[^1].Size.Height + 3, 6);
-            new Instr_GroupAnimFormule(Formules.QuickTransition, null, ConstClosePanelHitY, null, ConstClosePanelHitH).InitGroupAnimation(pHitCommandConsole);
+            else if (LabelHitCommand.Count > HitCommandText.Length)
+            {
+                for (int i = 0; i < LabelHitCommand.Count; i++)
+                {
+                    if (i < HitCommandText.Length)
+                    {
+                        LabelHitCommand[i].ElementText = HitCommandText[i];
+                        if (LabelHitCommand[i].Width > MaxWigth) MaxWigth = LabelHitCommand[i].Width;
+                        LabelHitCommand[i].Visible = true;
+                    }
+                    else LabelHitCommand[i].Visible = false;
+                }
+            }
+            else
+            {
+                for (int i = 0; i < LabelHitCommand.Count; i++)
+                {
+                    LabelHitCommand[i].ElementText = HitCommandText[i];
+                    if (LabelHitCommand[i].Width > MaxWigth) MaxWigth = LabelHitCommand[i].Width;
+                    LabelHitCommand[i].Visible = true;
+                }
+            }
+            if (HitCommandText.Length > 0)
+            {
+                FormFlags.ActiveHitPanelConsole.Value = true;
+                IELHitCommand hit = LabelHitCommand[HitCommandText.Length - 1];
+                pHitCommandConsole.Width = MaxWigth + 6;
+                pHitCommandConsole.Height = hit.Location.Y + hit.Height + 3;
+                pHitCommandConsole.Location = new(tbInput.Location.X + tbInput.Width - MaxWigth - 9, tbInput.Location.Y - pHitCommandConsole.Height);
+            }
+            else HitPanelDiactivate();
+            ObjLog.LOGTextAppend($"{LabelHitCommand.Count} - {HitCommandText.Length} !");
         }
 
         /// <summary>
@@ -833,15 +822,9 @@ namespace AAC
         {
             if (!FormFlags.ActiveHitPanelConsole.Value) return;
             FormFlags.ActiveHitPanelConsole.Value = false;
-            ConstAnimMove ConstClosePanelHitY = new(pHitCommandConsole.Location.Y, pHitCommandConsole.Location.Y + pHitCommandConsole.Size.Height, 6);
-            ConstAnimMove ConstClosePanelHitH = new(pHitCommandConsole.Size.Height, 0, 6);
-            Instr_GroupAnimFormule GroupClose = new(Formules.QuickTransition, null, ConstClosePanelHitY, null, ConstClosePanelHitH);
-            GroupClose.InitGroupAnimation(pHitCommandConsole);
-            for (int i = 0; i < LabelHitCommand.Count; i++)
-            {
-                LabelHitCommand[i].Dispose();
-                LabelHitCommand.RemoveAt(i);
-            }
+            pHitCommandConsole.Width = 0;
+            pHitCommandConsole.Height = 0;
+            pHitCommandConsole.Location = new(tbInput.Location.X + tbInput.Width, tbInput.Location.Y);
         }
 
         /// <summary>

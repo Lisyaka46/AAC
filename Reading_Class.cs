@@ -292,9 +292,7 @@ namespace AAC
                     new ConsoleCommand("save_log", [], "Сохраняет сообщения журнала в отдельный файл TXT", (param) =>
                     {
                         ObjLog.LOGTextAppend($"Была вызвана команда сохранения информации журнала");
-                        StreamWriter file_write = new($"{Directory.GetCurrentDirectory()}/Data/Log/{DateTime.Now:HH.mm.ss}.txt");
-                        file_write.Write(ObjLog.MassLogElements.Select(i => i.Text).ToArray());
-                        file_write.Close();
+                        System.IO.File.WriteAllLines($"Data/Log/{DateTime.Now:HH.mm.ss}.txt", ObjLog.MassLogElements.Select(i => i.Text));
                         return Task.FromResult(new CommandStateResult(ResultState.Complete, $">>> The data was successfully saved in the file: ..Data/Log/{DateTime.Now:HH.mm.ss}.txt\n", string.Empty));
                     }),
                     new ConsoleCommand("delete_log", [new Parameter("Name", false)], "Удаляет отдельный файл сообщений при указании его имени. При отсутствии имени будет предложено удалить все файлы сообщений", (param) =>
