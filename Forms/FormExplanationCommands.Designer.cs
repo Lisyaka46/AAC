@@ -337,7 +337,7 @@
             SizeGripStyle = SizeGripStyle.Hide;
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Information Commands";
-            FormClosing += ApplicationInfoCommandCLR_FormClosing;
+            FormClosing += ApplicationInfoCommand_FormClosing;
             ResumeLayout(false);
             PerformLayout();
         }

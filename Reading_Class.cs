@@ -253,7 +253,7 @@ namespace AAC
                             Apps.InformationCommand.Show();
                             ObjLog.LOGTextAppend($"Форма пояснения всех команд открыта с ошибкой: <Во избежании была создана новая форма>");
                         }
-                        Apps.MainForm.FoldingApplication(null, null);
+                        Apps.MainForm.FoldingOpacityApplication();
                         return Task.FromResult(CommandStateResult.Completed);
                     }),
                     new ConsoleCommand("windows_bat", [new Parameter("Name", true)], "Активирует BAT файл с заданным именем в определённой директории", (param) =>
@@ -375,25 +375,25 @@ namespace AAC
         {
             return
             [
-                new VoiceCommand(["ты работаешь", "ты жив"], "Воспроизводит звук подтверждая что голосовые команды работают", () =>
+                new VoiceCommand(["ты работаешь", "ты жив", "состояние голоса", "состояние госовых команд"], "Воспроизводит звук подтверждая что голосовые команды работают", () =>
                 {
-                    MainData.MainMP3.PlaySound("YesVoice");
+                    MainData.MainMP3.PlaySound("Complete");
                     return Task.FromResult(CommandStateResult.Completed);
                 }),
-                new VoiceCommand(["закрой программу", "закрыть программу"], "Завершает работу программы", () =>
+                new VoiceCommand(["закрой программу", "закрыть программу", "закрыть приложение", "закрой приложение"], "Завершает работу программы", () =>
                 {
                     ConsoleCommand.ReadConsoleCommand(MainData.MainCommandData.MassConsoleCommand, "close");
                     return Task.FromResult(CommandStateResult.Completed);
                 }),
-                new VoiceCommand(["очистить", "очисти вывод", "очисти консоль"], "Очищает вывод консоли", () =>
+                new VoiceCommand(["очистить", "очисти", "очистить вывод", "очисти вывод", "очистить консоль", "очисти консоль"], "Очищает вывод консоли", () =>
                 {
                     ConsoleCommand.ReadConsoleCommand(MainData.MainCommandData.MassConsoleCommand, "clear");
                     return Task.FromResult(CommandStateResult.Completed);
                 }),
-                new VoiceCommand(["активируй программу", "появись", "развернуть программу"], "Разворачивает программу делая её активным окном", () =>
+                new VoiceCommand(["активировать программу", "активируй программу", "появись", "развернуть программу", "разверни программу"], "Разворачивает программу делая её активным окном", () =>
                 {
-                    if (Apps.MainForm.StateAnimWindow != StateAnimateWindow.Active)
-                        Apps.MainForm.UnfoldingApplication(null, null);
+                    if (Apps.MainForm.StateAnimWindow == StateAnimateWindow.HalfHide) Apps.MainForm.UnfoldingOpacityApplication();
+                    else if (Apps.MainForm.StateAnimWindow == StateAnimateWindow.Hide) Apps.MainForm.UnfoldingMoveApplication();
                     return Task.FromResult(CommandStateResult.Completed);
                 }),
                 new VoiceCommand(["блок", "заблокировать компьютер", "заблокируй компьютер"], "Блокирует компьютер выводя начальный экран", () =>
@@ -401,7 +401,7 @@ namespace AAC
                     if (!DLLMethods.LockWorkStation()) throw new Win32Exception(Marshal.GetLastWin32Error());
                     return Task.FromResult(CommandStateResult.Completed);
                 }),
-                new VoiceCommand(["выключи голосовые команды", "отключи голос", "отключить голос"], "Выключает голосовые команды", () =>
+                new VoiceCommand(["выключить голосовые команды", "выключи голосовые команды", "отключить голос", "отключи голос"], "Выключает голосовые команды", () =>
                 {
                     Apps.MainForm.VoiceButtonImageUpdate(StatusFlags.Sleep, false);
                     MainData.InputVoiceDevice.Diactivate();

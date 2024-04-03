@@ -92,7 +92,6 @@
             pbHappyBigthday = new PictureBox();
             pMainConsole = new Panel();
             pHitCommandConsole = new Panel();
-            lHit = new Label();
             pbLoadingIndicator = new PictureBox();
             pMiniPanelOutput = new Panel();
             pmpLabel = new Panel();
@@ -146,7 +145,6 @@
             InputPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pbHappyBigthday).BeginInit();
             pMainConsole.SuspendLayout();
-            pHitCommandConsole.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pbLoadingIndicator).BeginInit();
             pMiniPanelOutput.SuspendLayout();
             pmpLabel.SuspendLayout();
@@ -1019,23 +1017,12 @@
             // 
             // pHitCommandConsole
             // 
-            pHitCommandConsole.BackColor = Color.Black;
+            pHitCommandConsole.BackColor = Color.DarkGray;
             pHitCommandConsole.BorderStyle = BorderStyle.FixedSingle;
-            pHitCommandConsole.Controls.Add(lHit);
-            pHitCommandConsole.Location = new Point(300, 448);
+            pHitCommandConsole.Location = new Point(271, 526);
             pHitCommandConsole.Name = "pHitCommandConsole";
-            pHitCommandConsole.Size = new Size(40, 60);
+            pHitCommandConsole.Size = new Size(69, 27);
             pHitCommandConsole.TabIndex = 47;
-            // 
-            // lHit
-            // 
-            lHit.AutoSize = true;
-            lHit.ForeColor = Color.White;
-            lHit.Location = new Point(2, 2);
-            lHit.Name = "lHit";
-            lHit.Size = new Size(34, 15);
-            lHit.TabIndex = 0;
-            lHit.Text = "color";
             // 
             // pbLoadingIndicator
             // 
@@ -1464,7 +1451,6 @@
             bMinimizedApplication.Text = "━";
             bMinimizedApplication.TextAlign = ContentAlignment.TopCenter;
             bMinimizedApplication.UseVisualStyleBackColor = false;
-            bMinimizedApplication.Click += FoldingMoveApplication;
             // 
             // bCloseApplication
             // 
@@ -1519,7 +1505,6 @@
             MinimizeBox = false;
             Name = "MainApplication";
             StartPosition = FormStartPosition.CenterScreen;
-            Activated += UnfoldingApplication;
             Deactivate += Application_Deactivate;
             Shown += ApplicationCLR_Shown;
             ((System.ComponentModel.ISupportInitialize)Internet_Info).EndInit();
@@ -1545,8 +1530,6 @@
             ((System.ComponentModel.ISupportInitialize)pbHappyBigthday).EndInit();
             pMainConsole.ResumeLayout(false);
             pMainConsole.PerformLayout();
-            pHitCommandConsole.ResumeLayout(false);
-            pHitCommandConsole.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)pbLoadingIndicator).EndInit();
             pMiniPanelOutput.ResumeLayout(false);
             pmpLabel.ResumeLayout(false);
@@ -1639,7 +1622,6 @@
         public TextBox tbNameColorParamContains;
         public Panel pLabelExplorer;
         public Panel pAllVisualLabel;
-        private Label lHit;
         public Panel pHitCommandConsole;
         public Label lDeveloper_CPUProgress;
         public Panel pDeveloperElements;

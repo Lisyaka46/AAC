@@ -25,7 +25,7 @@ namespace AAC
 
         public void CloseForm(object sender, EventArgs e)
         {
-            Apps.MainForm.UnfoldingApplication(null, null);
+            Apps.MainForm.UnfoldingOpacityApplication();
             AnimationDL.StopAnimate(AnimationDL.StyleAnimateObj.AnimFormule, lGlobalProName.Name);
             AnimationDL.StopAnimate(AnimationDL.StyleAnimateObj.AnimFormule, pThanksCreators.Name);
             Close();

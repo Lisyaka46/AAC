@@ -202,10 +202,11 @@ namespace AAC
             else if (StateReadInfo == StateReadInfoCommand.VoiceCommand) bAllVoiceCommand.ForeColor = Color.White;
             //else if (ObjInfo.ActivateStateInfo == StateDescriptionInfo.SoftCommand) bSoftCommand.ForeColor = Color.White;
         }
-        private void ApplicationInfoCommandCLR_FormClosing(object sender, FormClosingEventArgs e)
+        private void ApplicationInfoCommand_FormClosing(object sender, FormClosingEventArgs e)
         {
-            Apps.MainForm.UnfoldingApplication(null, null);
-            Apps.InformationCommand = null;
+            if (Apps.MainForm.StateAnimWindow == StateAnimateWindow.HalfHide) Apps.MainForm.UnfoldingOpacityApplication();
+            else if (Apps.MainForm.StateAnimWindow == StateAnimateWindow.Hide) Apps.MainForm.UnfoldingMoveApplication();
+            Apps.InformationCommand.Dispose();
         }
 
         private void ButtonMouseEnter(object sender, EventArgs e)

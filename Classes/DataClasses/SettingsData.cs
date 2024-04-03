@@ -114,62 +114,62 @@ namespace AAC.Classes.DataClasses
         /// <summary>
         /// Параметр настроек <b>"Градиент специального цвета SC"</b>
         /// </summary>
-        public readonly SettingsParameter Color_Gradient_SC;
+        public SettingsParameter Color_Gradient_SC { get; }
 
         /// <summary>
         /// Параметр настроек <b>"Размер текста в консольной строке"</b>
         /// </summary>
-        public readonly SettingsParameter Font_Size_Console_Text;
+        public SettingsParameter Font_Size_Console_Text { get; }
 
         /// <summary>
         /// Параметр настроек <b>"Выключение Alt режима при закрытии PAC"</b>
         /// </summary>
-        public readonly SettingsBoolParameter Alt_Diactivate_PAC;
+        public SettingsBoolParameter Alt_Diactivate_PAC { get; }
 
         /// <summary>
         /// Параметр настроек <b>"Использование специальных цветов"</b>
         /// </summary>
-        public readonly SettingsBoolParameter All_SpecialColor_Activate;
+        public SettingsBoolParameter All_SpecialColor_Activate { get; }
 
         /// <summary>
         /// Параметр настроек <b>"Специальный цвет RGB"</b>
         /// </summary>
-        public readonly SettingsBoolParameter SpecialColor_RGB;
+        public SettingsBoolParameter SpecialColor_RGB { get; }
 
         /// <summary>
         /// Параметр настроек <b>"Специальный цвет RGBCC"</b>
         /// </summary>
-        public readonly SettingsBoolParameter SpecialColor_RGBCC;
+        public SettingsBoolParameter SpecialColor_RGBCC { get; }
 
         /// <summary>
         /// Параметр настроек <b>"Специальный цвет SC"</b>
         /// </summary>
-        public readonly SettingsBoolParameter SpecialColor_SC;
+        public SettingsBoolParameter SpecialColor_SC { get; }
 
         /// <summary>
         /// Параметр настроек <b>"Режим разработчика"</b>
         /// </summary>
-        public readonly SettingsBoolParameter Developer_Mode;
+        public SettingsBoolParameter Developer_Mode { get; }
 
         /// <summary>
         /// Параметр настроек <b>"Активация голосовых команд"</b>
         /// </summary>
-        public readonly SettingsBoolParameter Activation_Microphone;
+        public SettingsBoolParameter Activation_Microphone { get; }
 
         /// <summary>
         /// Параметр настроек <b>"Изменение позиции главной формы за границей экрана"</b>
         /// </summary>
-        public readonly SettingsBoolParameter Moving_Border_Screen_Form;
+        public SettingsBoolParameter Moving_Border_Screen_Form { get; }
 
         /// <summary>
         /// Параметр настроек <b>"Подсказки к командам"</b>
         /// </summary>
-        public readonly SettingsBoolParameter Hit_Panel;
+        public SettingsBoolParameter Hit_Panel { get; }
 
         /// <summary>
         /// Кол-во вместимых объектов в буфер
         /// </summary>
-        public readonly SettingsParameter Buffer_Count_Elements;
+        public SettingsParameter Buffer_Count_Elements { get; }
 
         /// <summary>
         /// Параметр настроек <b>"Использовать LAlt режим только для включения, RAlt только для выключения Alt режима в PAC"</b>
@@ -209,7 +209,7 @@ namespace AAC.Classes.DataClasses
             if (File.Exists(DitectoryOptionFile))
             {
                 Startcs.ObjLog.LOGTextAppend("Открыто чтение файла Option.r1");
-                SettingInitialValues(this);
+                SettingInitialValues();
             }
             else
             {
@@ -228,7 +228,7 @@ namespace AAC.Classes.DataClasses
         /// Присвоить все данные согласно файлу Option.r1
         /// </summary>
         /// <param name="Data">Настройки куда ссылается объект</param>
-        private static void SettingInitialValues(SettingsData Data)
+        private void SettingInitialValues()
         {
             static void Fail(string TypeName, string Name, string Value) => Startcs.ObjLog.LOGTextAppend($"FAIL => {TypeName} ({Name}: \"{Value}\")");
             static void SetValueBool(SettingsBoolParameter boolParameter, string Value)
@@ -269,20 +269,20 @@ namespace AAC.Classes.DataClasses
                     case nameof(SpecialColor_SC):
                     case nameof(Moving_Border_Screen_Form):
                     case nameof(Alt_OrientationLR_PAC):
-                        if (Data.GetType().GetProperty(CollectionName[i])?.GetValue(Data, null) is SettingsBoolParameter BoolParameter) SetValueBool(BoolParameter, CollectionValue[i]);
-                        else Startcs.ObjLog.LOGTextAppend($"Параметр был проигнорирован. (Нулевой объект чтения {CollectionName[i]} => SettingsBoolParameter)");
+                        if (GetType().GetProperty(CollectionName[i])?.GetValue(this, null) is SettingsBoolParameter BoolParameter) SetValueBool(BoolParameter, CollectionValue[i]);
+                        else ObjLog.LOGTextAppend($"Параметр был проигнорирован. (Нулевой объект \"{GetType().GetProperty(CollectionName[i]) == null}\" чтения {CollectionName[i]} => SettingsBoolParameter)");
                         break;
 
                     case nameof(Buffer_Count_Elements):
                     case nameof(Font_Size_Console_Text):
                     case nameof(Color_Gradient_SC):
-                        if (Data.GetType().GetProperty(CollectionName[i])?.GetValue(Data, null) is SettingsParameter Parameter) SetValue(Parameter, CollectionValue[i]);
-                        else Startcs.ObjLog.LOGTextAppend($"Параметр был проигнорирован. (Нулевой объект чтения {CollectionName[i]} => SettingsParameter)");
+                        if (GetType().GetProperty(CollectionName[i])?.GetValue(this, null) is SettingsParameter Parameter) SetValue(Parameter, CollectionValue[i]);
+                        else ObjLog.LOGTextAppend($"Параметр был проигнорирован. (Нулевой объект чтения {CollectionName[i]} => SettingsParameter)");
                         break;
 
                     case nameof(HC_Alt_Activate_PAC):
                     case nameof(HC_Alt_Diactivate_PAC):
-                        if (Data.GetType().GetProperty(CollectionName[i])?.GetValue(Data, null) is SettingsParameter KeyParameter)
+                        if (GetType().GetProperty(CollectionName[i])?.GetValue(this, null) is SettingsParameter KeyParameter)
                         {
                             SetValue(KeyParameter, Enum.Parse(typeof(Keys), CollectionValue[i]));
                         }
