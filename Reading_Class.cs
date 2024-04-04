@@ -4,12 +4,8 @@ using AAC.Classes.DataClasses;
 using IWshRuntimeLibrary;
 using System.ComponentModel;
 using System.Data;
-using System.Data.OleDb;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-using System.Text.RegularExpressions;
-using System.Xml.Linq;
-using static AAC.Classes.AnimationDL.Animate;
 using static AAC.Classes.AnimationDL.Animate.AnimText;
 using static AAC.Startcs;
 
@@ -394,10 +390,9 @@ namespace AAC
                     ConsoleCommand.ReadConsoleCommand(MainData.MainCommandData.MassConsoleCommand, "clear");
                     return Task.FromResult(CommandStateResult.Completed);
                 }),
-                new VoiceCommand(["активировать программу", "активируй программу", "появись", "развернуть программу", "разверни программу"], "Разворачивает программу делая её активным окном", () =>
+                new VoiceCommand(["активировать программу", "активируй программу", "развернуть", "развернуть программу", "разверни программу"], "Разворачивает программу делая её активным окном", () =>
                 {
-                    if (Apps.MainForm.StateAnimWindow == StateAnimateWindow.HalfHide) Apps.MainForm.UnfoldingOpacityApplication();
-                    else if (Apps.MainForm.StateAnimWindow == StateAnimateWindow.Hide) Apps.MainForm.UnfoldingMoveApplication();
+                    if (Apps.MainForm.StateAnimWindow == StateAnimateWindow.Hide) Apps.MainForm.UnfoldingMoveApplication();
                     return Task.FromResult(CommandStateResult.Completed);
                 }),
                 new VoiceCommand(["блок", "заблокировать компьютер", "заблокируй компьютер"], "Блокирует компьютер выводя начальный экран", () =>
@@ -407,10 +402,19 @@ namespace AAC
                 }),
                 new VoiceCommand(["выключить голосовые команды", "выключи голосовые команды", "отключить голос", "отключи голос"], "Выключает голосовые команды", () =>
                 {
-                    Apps.MainForm.VoiceButtonImageUpdate(StatusFlags.Sleep, false);
+                    Apps.MainForm.VoiceButtonImageUpdate(InputVoiceCommandDevice.StatusVoiceCommand.Sleep, false);
                     MainData.InputVoiceDevice.Diactivate();
-                    MainData.Flags.AudioCommand = StatusFlags.Sleep;
                     if (Apps.MainForm.StateAnimWindow != StateAnimateWindow.Active) MainData.MainMP3.PlaySound("Complete");
+                    return Task.FromResult(CommandStateResult.Completed);
+                }),
+                new VoiceCommand(["свернуть", "свернуть программу", "сверни программу", "свернуть приложение", "сверни приложение"], "Сворачивает приложение", () =>
+                {
+                    if (Apps.MainForm.StateAnimWindow == StateAnimateWindow.Active) Apps.MainForm.FoldingMoveApplication();
+                    return Task.FromResult(CommandStateResult.Completed);
+                }),
+                new VoiceCommand(["открыть рабочую директорию", "открой рабочую директорию", "открыть активную директорию", "открой активную диреторию"], "Сворачивает приложение", () =>
+                {
+                    Process.Start("explorer.exe", Directory.GetCurrentDirectory());
                     return Task.FromResult(CommandStateResult.Completed);
                 }),
             ];
@@ -419,9 +423,6 @@ namespace AAC
         {
             switch (ID)
             {
-                case 6: // спрячся
-                    Apps.MainForm.FoldingMoveApplication(null, null);
-                    return CommandStateResult.Completed;
                 case 7: // открой рабочую директорию
                     Process.Start("explorer.exe", Directory.GetCurrentDirectory());
                     return CommandStateResult.Completed;
@@ -431,12 +432,6 @@ namespace AAC
                     return CommandStateResult.Completed;
                 case 9: // открой панель управления
                     if (DLLMethods.ShellGUID("CommandPanelWin")) MainData.MainMP3.PlaySound("Complete");
-                    return CommandStateResult.Completed;
-                case 12: // выключи голосовые команды
-                    Apps.MainForm.pbVoiceButton.Image = Image.FromFile(@"Data\Image\Micro\MicroSleepingNotMouse.png");
-                    MainData.Flags.AudioCommand = StatusFlags.Sleep;
-                    if (Apps.MainForm.WindowState != FormWindowState.Normal)
-                        MainData.MainMP3.PlaySound("Complete");
                     return CommandStateResult.Completed;
                 case 13: // закрой окно информации
                     if (Apps.InformationCommand.Visible)
@@ -474,10 +469,6 @@ namespace ConsoleApplication5
         }
     }
     TimeTempus();
-                    return CommandStateResult.Completed;
-                case 15:
-                    Apps.MainForm.pbVoiceButton.Image = Image.FromFile(@"Data\Image\Micro\MicroActivateNotMouse.png");
-                    MainData.Flags.AudioCommand = StatusFlags.Active;
                     return CommandStateResult.Completed;
             }
             return new CommandStateResult(ResultState.Failed,

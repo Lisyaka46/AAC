@@ -7,28 +7,6 @@ using System.Threading.Tasks;
 namespace AAC.Classes.DataClasses
 {
     /// <summary>
-    /// Статус обычного Флага
-    /// </summary>
-    public enum StatusFlags
-    {
-
-        /// <summary>
-        /// Не активен
-        /// </summary>
-        NotActive = 0,
-
-        /// <summary>
-        /// Активен
-        /// </summary>
-        Active = 1,
-
-        /// <summary>
-        /// Состояние спящего режима или состояние проверки точного состояния
-        /// </summary>
-        Sleep = 2
-    }
-
-    /// <summary>
     /// Статус Флага диалогового окна
     /// </summary>
     public enum DialogWindowStatus

@@ -27,6 +27,11 @@ namespace AAC
             /// <summary>
             /// Статус активности объекта пояснения
             /// </summary>
+            public Flag ActivateUppingPanel { get; } = new(false);
+
+            /// <summary>
+            /// Статус активности объекта пояснения
+            /// </summary>
             public Flag Information { get; } = new(false);
 
             /// <summary>
@@ -83,9 +88,9 @@ namespace AAC
         private readonly Flags FormFlags = new();
 
         /// <summary>
-        /// Путь к файлу ярлыков
+        /// Путь к папке Info
         /// </summary>
-        public const string ObjLabelFilePath = $"Data\\Info\\Label.r1";
+        public const string PathFolderInfo = $"Data\\Info";
 
         /// <summary>
         /// Активная панель в PAC
@@ -143,18 +148,12 @@ namespace AAC
         private readonly List<Keys> ControlKey;
 
         /// <summary>
-        /// Поток изменения видимости приложения
-        /// </summary>
-        private Thread? ThreadWindow { get; set; }
-
-        /// <summary>
         /// Инициализация главной формы программы
         /// </summary>
         public MainApplication()
         {
             InitializeComponent();
             PAC_Buffer.InitializeNewBuffer((int)MainData.Settings.Buffer_Count_Elements.Value);
-            //ResHit = new();
 
             /* Создание отслеживания флагов */
             if ((bool)MainData.Settings.Developer_Mode)
@@ -166,27 +165,24 @@ namespace AAC
                 });
             }
 
-            StateAnimWindow = StateAnimateWindow.Hide;
-            if (Screen.PrimaryScreen != null)
-                SavePositionAnimateWindow = new(Screen.PrimaryScreen.Bounds.Width / 2 - Size.Width / 2, Screen.PrimaryScreen.Bounds.Height / 2 - Size.Height / 2);
-            else SavePositionAnimateWindow = new(0, 0);
+            StateAnimWindow = StateAnimateWindow.HalfHide;
+
             ControlKey = [];
             LabelHitCommand = [];
+            ActivatePACPanelPage = pmpMain;
 
             MainData.AllSpecialColor.RGB.AddElement(lDeveloper_RGB_Text);
             MainData.AllSpecialColor.RGB.AddElement(lTitleApplication);
             MainData.AllSpecialColor.RGBCC.AddElement(lDeveloper_RGBTextCC);
             MainData.AllSpecialColor.SC.AddElement(lDeveloper_TextSC);
 
-            ActivatePACPanelPage = pmpMain;
-
             LabelAccess =
             [
                 new(new("New Label", null, InfoLabelAccess.TypeActionLabel.InitializeCommand, "new_label"), pAllVisualLabel, TypeLabel.System, 0),
                 new(new("Main Dir", null, InfoLabelAccess.TypeActionLabel.OpenDirectoryElement, Directory.GetCurrentDirectory()), pAllVisualLabel, TypeLabel.System, 1),
             ];
-            if (File.Exists(ObjLabelFilePath)) ReadPanelsLabel(File.ReadAllText(ObjLabelFilePath), pAllVisualLabel, ref LabelAccess);
-            else File.Create(ObjLabelFilePath);
+            if (File.Exists($"{PathFolderInfo}\\Label.r1")) ReadPanelsLabel(File.ReadAllText($"{PathFolderInfo}\\Label.r1"), pAllVisualLabel, ref LabelAccess);
+            else File.Create($"{PathFolderInfo}\\Label.r1");
 
             ScrollLabels = new(LabelAccess.Count, 8);
             pAllVisualLabel.MouseWheel += (sender, e) =>
@@ -207,13 +203,8 @@ namespace AAC
 
 
             UpdateTheme(MainData.MainThemeData.ActivityTheme);
-            if ((bool)MainData.Settings.Activation_Microphone)
-            {
-                MainData.Flags.AudioCommand = StatusFlags.Active;
-                //MainData.InputVoiceDevice.RecordInput.RecognizeAsync();
-            }
-            else MainData.Flags.AudioCommand = StatusFlags.NotActive;
-            VoiceButtonImageUpdate(MainData.Flags.AudioCommand, false);
+            VoiceButtonImageUpdate(MainData.InputVoiceDevice.VoiceStatus, false);
+
             if ((int)MainData.Settings.Font_Size_Console_Text.Value >= 7 && (int)MainData.Settings.Font_Size_Console_Text.Value <= 40)
                 tbOutput.Font = new(tbOutput.Font.Name, Convert.ToInt32(MainData.Settings.Font_Size_Console_Text.Value));
             else new Instr_AnimText(tbOutput, $">>> Fail install int parameter \"FontSize\": {MainData.Settings.Font_Size_Console_Text.Value} (7 - 40)").AnimInit(true);
@@ -228,124 +219,120 @@ namespace AAC
             bRebootApplication.MouseLeave += (sender, e) => DisactivateLabelInfo();
 
 
-            pDeveloper.MouseWheel += (sender, e) => { MiniFunctions.UpdateVScrollBar(Apps.MainForm.sbhDebeloper, e.Delta); };
+            pDeveloper.MouseWheel += (sender, e) => { MiniFunctions.UpdateVScrollBar(sbhDebeloper, e.Delta); };
             sbhDebeloper.ValueChanged += (sender, e) => { MiniFunctions.MoveElementinVScrollBar(pDeveloperElements, sbhDebeloper, 3); };
 
-            //pmpBufferCommandButtons.MouseWheel += (sender, e) => { MiniFunctions.UpdateVScrollBar(App.MainForm.PAC_sbBuffer, e.Delta); };
-            //PAC_sbBuffer.ValueChanged += (sender, e) => { MiniFunctions.MoveElementinVScrollBar(pmpBufferCommandButtons, PAC_sbBuffer, 23); };
             CgangeAllButtonAltMode();
             pMiniPanelOutput.PreviewKeyDown += (sender, e) => AltMiniPanelDetect(e.KeyCode);
 
             bMinimizedApplication.Click += (sender, e) => FoldingMoveApplication();
-            Activated += (sender, e) =>
-            {
-                if (Apps.MainForm.StateAnimWindow == StateAnimateWindow.Hide) UnfoldingMoveApplication();
-                else UnfoldingOpacityApplication();
-            };
 
-            // Кнопка в PAC "Редактор цветовых палитр"
-            PAC_bColoredTheme.ActivateButton += (KeyActivity) =>
-            {
-                PAC_Disactivate();
-                ConsoleCommand.ReadConsoleCommand(MainData.MainCommandData.MassConsoleCommand, "colored");
-            };
+            /*Настройка событий нажатий на кнопки PAC*/ {
 
-            // Кнопка в PAC "Изменить цвет текста"
-            PAC_bSetColor.ActivateButton += (KeyActivity) =>
-            {
-                PAC_Disactivate();
-                //TypeCommand.ReadDefaultConsoleCommand("color").ExecuteCommand(false);
-            };
-
-            // Кнопка в PAC "Очистить текст из консоли"
-            PAC_bClearConsole.ActivateButton += (KeyActivity) =>
-            {
-                PAC_Disactivate();
-                ConsoleCommand.ReadConsoleCommand(MainData.MainCommandData.MassConsoleCommand, "clear");
-            };
-
-            // Кнопка в PAC "Журнал сообщений"
-            PAC_bLogMessage.ActivateButton += (KeyActivity) =>
-            {
-                PAC_Disactivate();
-                ConsoleCommand.ReadConsoleCommand(MainData.MainCommandData.MassConsoleCommand, "log");
-            };
-
-            //
-            PAC_bClearBuffer.ActivateButton += (KeyActivity) =>
-            {
-                ClearBufferCommand();
-            };
-
-            // Кнопка в PAC "Командный буфер..."
-            PAC_bCommandBuffer.ActivateButton += (KeyActivity) =>
-            {
-                LmpExecuteCommands_Click();
-            };
-
-            PAC_bBackBuffer.ActivateButton += (KeyActivity) =>
-            {
-                MiniFunctions.OpenNewMiniMenu(pmpMain, ActivatePACPanelPage, 0, DirectionsParties.Left);
-                ActivatePACPanelPage = pmpMain;
-            };
-
-            // Кнопка в PAC "Проводник"
-            PAC_bConductor.ActivateButton += (KeyActivity) =>
-            {
-                MiniFunctions.OpenNewMiniMenu(pmpExplorer, ActivatePACPanelPage, 0);
-                ActivatePACPanelPage = pmpExplorer;
-            };
-
-            // Кнопка в PAC <Conductor> "Назад"
-            PAC_bBackConductor.ActivateButton += (KeyActivity) =>
-            {
-                MiniFunctions.OpenNewMiniMenu(pmpMain, ActivatePACPanelPage, 0, DirectionsParties.Left);
-                ActivatePACPanelPage = pmpMain;
-            };
-
-            // Кнопка в PAC "Активный проводник"
-            PAC_bActiveExplorer.ActivateButton += (KeyActivity) =>
-            {
-                PAC_Disactivate();
-                Process.Start("explorer.exe", Directory.GetCurrentDirectory());
-            };
-
-            // Кнопка в PAC "Главный проводник"
-            PAC_bMainExplorer.ActivateButton += (KeyActivity) =>
-            {
-                PAC_Disactivate();
-                Process.Start("explorer.exe");
-            };
-
-            // Кнопка в PAC "Активировать ярлык"
-            PAC_bActivateLabel.ActivateButton += (KeyActivity) =>
-            {
-                if (PAC_IndexIELLabelAccess.HasValue)
+                // Кнопка в PAC "Редактор цветовых палитр"
+                PAC_bColoredTheme.ActivateButton += (KeyActivity) =>
                 {
-                    LabelAccess[PAC_IndexIELLabelAccess.Value].IELLabelAccess_ActivateLabel();
                     PAC_Disactivate();
-                }
-            };
+                    ConsoleCommand.ReadConsoleCommand(MainData.MainCommandData.MassConsoleCommand, "colored");
+                };
 
-            // Кнопка в PAC "Активировать ярлык"
-            PAC_bDeleteLabel.ActivateButton += (KeyActivity) =>
-            {
-                if (PAC_IndexIELLabelAccess.HasValue)
+                // Кнопка в PAC "Изменить цвет текста"
+                PAC_bSetColor.ActivateButton += (KeyActivity) =>
                 {
-                    ConstAnimMove ConstantFormule;
-                    LabelAccess.RemoveAt(PAC_IndexIELLabelAccess.Value);
-                    if (ScrollLabels.MaxValue > 0)
+                    PAC_Disactivate();
+                    //TypeCommand.ReadDefaultConsoleCommand("color").ExecuteCommand(false);
+                };
+
+                // Кнопка в PAC "Очистить текст из консоли"
+                PAC_bClearConsole.ActivateButton += (KeyActivity) =>
+                {
+                    PAC_Disactivate();
+                    ConsoleCommand.ReadConsoleCommand(MainData.MainCommandData.MassConsoleCommand, "clear");
+                };
+
+                // Кнопка в PAC "Журнал сообщений"
+                PAC_bLogMessage.ActivateButton += (KeyActivity) =>
+                {
+                    PAC_Disactivate();
+                    ConsoleCommand.ReadConsoleCommand(MainData.MainCommandData.MassConsoleCommand, "log");
+                };
+
+                //
+                PAC_bClearBuffer.ActivateButton += (KeyActivity) =>
+                {
+                    ClearBufferCommand();
+                };
+
+                // Кнопка в PAC "Командный буфер..."
+                PAC_bCommandBuffer.ActivateButton += (KeyActivity) =>
+                {
+                    LmpExecuteCommands_Click();
+                };
+
+                PAC_bBackBuffer.ActivateButton += (KeyActivity) =>
+                {
+                    MiniFunctions.OpenNewMiniMenu(pmpMain, ActivatePACPanelPage, 0, DirectionsParties.Left);
+                    ActivatePACPanelPage = pmpMain;
+                };
+
+                // Кнопка в PAC "Проводник"
+                PAC_bConductor.ActivateButton += (KeyActivity) =>
+                {
+                    MiniFunctions.OpenNewMiniMenu(pmpExplorer, ActivatePACPanelPage, 0);
+                    ActivatePACPanelPage = pmpExplorer;
+                };
+
+                // Кнопка в PAC <Conductor> "Назад"
+                PAC_bBackConductor.ActivateButton += (KeyActivity) =>
+                {
+                    MiniFunctions.OpenNewMiniMenu(pmpMain, ActivatePACPanelPage, 0, DirectionsParties.Left);
+                    ActivatePACPanelPage = pmpMain;
+                };
+
+                // Кнопка в PAC "Активный проводник"
+                PAC_bActiveExplorer.ActivateButton += (KeyActivity) =>
+                {
+                    PAC_Disactivate();
+                    Process.Start("explorer.exe", Directory.GetCurrentDirectory());
+                };
+
+                // Кнопка в PAC "Главный проводник"
+                PAC_bMainExplorer.ActivateButton += (KeyActivity) =>
+                {
+                    PAC_Disactivate();
+                    Process.Start("explorer.exe");
+                };
+
+                // Кнопка в PAC "Активировать ярлык"
+                PAC_bActivateLabel.ActivateButton += (KeyActivity) =>
+                {
+                    if (PAC_IndexIELLabelAccess.HasValue)
                     {
-                        ScrollLabels.MaxDown(1);
-                        ConstantFormule = new(pAllVisualLabel.Location.Y, 14 - 56 * ScrollLabels.Value, 17);
-                        new ConstAnimMove(pAllVisualLabel.Location.X).InitAnimFormule(pAllVisualLabel, Formules.QuickTransition, ConstantFormule, AnimationStyle.XY);
+                        LabelAccess[PAC_IndexIELLabelAccess.Value].IELLabelAccess_ActivateLabel();
+                        PAC_Disactivate();
                     }
-                    for (int i = PAC_IndexIELLabelAccess.Value; i < LabelAccess.Count; i++) LabelAccess[i].SetLocationIndex(i);
-                    ConstantFormule = new(lBorderLabelDown.Location.Y, lBorderLabelDown.Location.Y - 56, 4);
-                    new ConstAnimMove(lBorderLabelDown.Location.X).InitAnimFormule(lBorderLabelDown, Formules.QuickTransition, ConstantFormule, AnimationStyle.XY);
-                    PAC_Disactivate();
-                }
-            };
+                };
+
+                // Кнопка в PAC "Активировать ярлык"
+                PAC_bDeleteLabel.ActivateButton += (KeyActivity) =>
+                {
+                    if (PAC_IndexIELLabelAccess.HasValue)
+                    {
+                        ConstAnimMove ConstantFormule;
+                        LabelAccess.RemoveAt(PAC_IndexIELLabelAccess.Value);
+                        if (ScrollLabels.MaxValue > 0)
+                        {
+                            ScrollLabels.MaxDown(1);
+                            ConstantFormule = new(pAllVisualLabel.Location.Y, 14 - 56 * ScrollLabels.Value, 17);
+                            new ConstAnimMove(pAllVisualLabel.Location.X).InitAnimFormule(pAllVisualLabel, Formules.QuickTransition, ConstantFormule, AnimationStyle.XY);
+                        }
+                        for (int i = PAC_IndexIELLabelAccess.Value; i < LabelAccess.Count; i++) LabelAccess[i].SetLocationIndex(i);
+                        ConstantFormule = new(lBorderLabelDown.Location.Y, lBorderLabelDown.Location.Y - 56, 4);
+                        new ConstAnimMove(lBorderLabelDown.Location.X).InitAnimFormule(lBorderLabelDown, Formules.QuickTransition, ConstantFormule, AnimationStyle.XY);
+                        PAC_Disactivate();
+                    }
+                };
+            }
 
             // Функция события для PSettings
             void EventPSettings()
@@ -362,8 +349,8 @@ namespace AAC
 
             lComplete.ForeColor = Color.Black;
 
-            pHitCommandConsole.Size = new(pHitCommandConsole.Width, 16);
-            pHitCommandConsole.Location = new(pHitCommandConsole.Location.X, tbInput.Location.Y);
+            pHitCommandConsole.Size = new(0, 0);
+            pHitCommandConsole.Location = new(tbInput.Location.X + tbInput.Width, tbInput.Location.Y);
 
             pDeveloper.Size = new(318, 493);
             pDeveloper.Location = new(792, 5);
@@ -371,10 +358,6 @@ namespace AAC
             sbhDebeloper.Size = new(sbhDebeloper.Size.Width, pDeveloper.Size.Height);
 
             pUppingMenu.Location = new(pUppingMenu.Location.X, -22);
-
-            //Flags.PAC_PanelAltActivate.Value = true;
-            //lmpClearBuffer.Location = new(58, 1);
-            //AltMiniPanelDetect(null, new(Keys.Menu));
 
             lInformationCursor.Hide();
             tbOutput.Size = new(771, 467);
@@ -385,7 +368,7 @@ namespace AAC
             Size = new(815, 577);
             MaximumSize = Size;
             MinimumSize = Size;
-            Opacity = 0d;
+            Opacity = 0.0d;
 
             lWhat.Size = new(20, 17);
             InputPanel.Size = new(InputPanel.Size.Width, 34);
@@ -409,7 +392,6 @@ namespace AAC
             MiniFunctions.CalculationDownElementScrollBar(clbDeveloperFlags, pDeveloperElements, pDeveloper, sbhDebeloper, 10, false);
 
             lActiveitedSoftCommand.Text = "Soft-Команды отключены";
-            //lActiveitedSoftCommand.Text = $"+{MainData.MainCommandData.SoftCommandData.NamesCommand.Length} Soft-{MiniFunctions.LogisticText(MainData.MainCommandData.SoftCommandData.NamesCommand.Length, "Команда")}";
 
             if ((bool)MainData.Settings.Developer_Mode) ObjLog.LOGTextAppend("Объявлено что программу запустил разработчик");
             else pDeveloper.Hide();
@@ -470,13 +452,6 @@ namespace AAC
             constAnim.AnimInit(lActiveitedSoftCommand, AnimStyleColor.ForeColor);
         }
 
-        private void Application_Deactivate(object sender, EventArgs e)
-        {
-            ObjLog.LOGTextAppend("Главная форма не активна");
-            FormFlags.FormActivity.Value = false;
-            FoldingOpacityApplication();
-        }
-
         /// <summary>
         /// Создать анимацию развёртывания или свёртывания панели ввода команды
         /// </summary>
@@ -493,25 +468,16 @@ namespace AAC
         public void VoiceInfo_Click(object sender, EventArgs e)
         {
             ObjLog.LOGTextAppend("Был нажат микрофон");
-            if (MainData.Flags.AudioCommand == StatusFlags.Active)
-            {
-                ObjLog.LOGTextAppend("Было обработано исключение на неполноценное выключение голосовых команд");
-                MainData.InputVoiceDevice.LimitationSpeech = true;
-                MainData.Flags.AudioCommand = StatusFlags.Sleep;
-            }
-            else if (MainData.Flags.AudioCommand == StatusFlags.Sleep)
-            {
-                ObjLog.LOGTextAppend("Было обработано исключение на ПОЛНОЕ отключение голосовых команд");
-                MainData.InputVoiceDevice.Diactivate();
-                MainData.Flags.AudioCommand = StatusFlags.NotActive;
-            }
-            else if (MainData.Flags.AudioCommand == StatusFlags.NotActive)
+            if (MainData.InputVoiceDevice.VoiceStatus == InputVoiceCommandDevice.StatusVoiceCommand.NotActive)
             {
                 ObjLog.LOGTextAppend("Было обработано исключение на выход из полного отключения голосовых команд");
                 MainData.InputVoiceDevice.Activate();
-                MainData.Flags.AudioCommand = StatusFlags.Active;
             }
-            VoiceButtonImageUpdate(MainData.Flags.AudioCommand, true);
+            else
+            {
+                MainData.InputVoiceDevice.Diactivate();
+            }
+            VoiceButtonImageUpdate(MainData.InputVoiceDevice.VoiceStatus, true);
         }
 
         private void TbOutput_TextChanged(object sender, EventArgs e)
@@ -832,6 +798,7 @@ namespace AAC
         /// </summary>
         private void PanelSettingsActivate()
         {
+            if (FormFlags.ActivateUppingPanel.Value) UpperPanelDiactivate(null, null);
             FormFlags.ActiveSettingsMiniPanel.Value = true;
             lSettingsVolume.Text = "Загрузка...";
             pSettingsVolumeDivace.Size = new(144, 24);
@@ -893,10 +860,21 @@ namespace AAC
         private void ApplicationCLR_Shown(object sender, EventArgs e)
         {
             new ConstAnimMove(Apps.MainForm.pICON.Location.X, 15, 8).InitAnimFormule(Apps.MainForm.pICON, Formules.QuickTransition, new(Apps.MainForm.pICON.Location.Y), AnimationStyle.XY);
-            Location = new(Location.X, Location.Y + 150);
-            WindowState = FormWindowState.Normal;
-            Show();
-            if (!Focused) Activate();
+            UnfoldingOpacityApplication();
+            Activated += (sender, e) =>
+            {
+                ObjLog.LOGTextAppend($"+# {StateAnimWindow}");
+                if (StateAnimWindow == StateAnimateWindow.Hide) UnfoldingMoveApplication();
+                else if (StateAnimWindow == StateAnimateWindow.HalfHide) UnfoldingOpacityApplication();
+                if (FormFlags.ActivateUppingPanel.Value && !FormFlags.MovingApplication.Value) UpperPanelDiactivate(null, null);
+                tbInput.Focus();
+            };
+            Deactivate += (sender, e) =>
+            {
+                ObjLog.LOGTextAppend($"-# {StateAnimWindow}");
+                if (FormFlags.ActivateUppingPanel.Value) UpperPanelDiactivate(null, null);
+                FoldingOpacityApplication();
+            };
         }
 
         /// <summary>
@@ -904,14 +882,14 @@ namespace AAC
         /// </summary>
         /// <param name="flag">Статус параметра голосовых команд</param>
         /// <param name="MouseEnter">Касается ли курсор объекта</param>
-        public void VoiceButtonImageUpdate(StatusFlags flag, bool MouseEnter)
+        public void VoiceButtonImageUpdate(InputVoiceCommandDevice.StatusVoiceCommand State, bool MouseEnter)
         {
             string DirectoryImage = @"Data\Image\Micro\Micro";
-            DirectoryImage += flag switch
+            DirectoryImage += State switch
             {
-                StatusFlags.Active => "Activate",
-                StatusFlags.Sleep => "Sleeping",
-                StatusFlags.NotActive => "Disactivate",
+                InputVoiceCommandDevice.StatusVoiceCommand.Active => "Activate",
+                InputVoiceCommandDevice.StatusVoiceCommand.Sleep => "Sleeping",
+                InputVoiceCommandDevice.StatusVoiceCommand.NotActive => "Disactivate",
                 _ => string.Empty
             };
             DirectoryImage += $"{(MouseEnter ? "Yes" : "Not")}Mouse.png";
@@ -922,12 +900,12 @@ namespace AAC
 
         private void VoiceButtonUpdateMouseEnter(object sender, EventArgs e)
         {
-            VoiceButtonImageUpdate(MainData.Flags.AudioCommand, true);
+            VoiceButtonImageUpdate(MainData.InputVoiceDevice.VoiceStatus, true);
         }
 
         private void Voice_Info_MouseLeave(object sender, EventArgs e)
         {
-            VoiceButtonImageUpdate(MainData.Flags.AudioCommand, false);
+            VoiceButtonImageUpdate(MainData.InputVoiceDevice.VoiceStatus, false);
         }
 
         private void BWhatInformation_MouseEnter(object sender, EventArgs e)
@@ -956,17 +934,18 @@ namespace AAC
 
         private void UpperPanelActivate(object sender, EventArgs e)
         {
-            if (FormFlags.FormActivity.Value)
-            {
-                ConstAnimMove ConstantFormule = new(pUppingMenu.Location.Y, -1, 9);
-                new ConstAnimMove(pUppingMenu.Location.X).InitAnimFormule(pUppingMenu, Formules.QuickTransition, ConstantFormule, AnimationStyle.XY);
-                if (FormFlags.PAC_PanelActivate.Value) PAC_Disactivate(false);
-                pUppingMenu.Focus();
-            }
+            if (StateAnimWindow == StateAnimateWindow.HalfHide) Show();
+            else pUppingMenu.Focus();
+            if (FormFlags.ActiveSettingsMiniPanel.Value) PanelSettingsDiactivate();
+            FormFlags.ActivateUppingPanel.Value = true;
+            ConstAnimMove ConstantFormule = new(pUppingMenu.Location.Y, -1, 9);
+            new ConstAnimMove(pUppingMenu.Location.X).InitAnimFormule(pUppingMenu, Formules.QuickTransition, ConstantFormule, AnimationStyle.XY);
+            if (FormFlags.PAC_PanelActivate.Value) PAC_Disactivate(false);
         }
 
         private void UpperPanelDiactivate(object sender, EventArgs e)
         {
+            FormFlags.ActivateUppingPanel.Value = false;
             ConstAnimMove ConstantFormule = new(pUppingMenu.Location.Y, -22, 9);
             new ConstAnimMove(pUppingMenu.Location.X).InitAnimFormule(pUppingMenu, Formules.QuickTransition, ConstantFormule, AnimationStyle.XY);
         }
@@ -995,29 +974,22 @@ namespace AAC
         /// </summary>
         public void UnfoldingOpacityApplication()
         {
-            if (ThreadWindow?.IsAlive ?? false) ThreadWindow.Interrupt();
             StateAnimWindow = StateAnimateWindow.OpacityHidePlus;
-            ThreadWindow = new(async () =>
+            int i = 0;
+            /*while (Opacity < 1d && StateAnimWindow == StateAnimateWindow.OpacityHidePlus)
             {
-                int i = 0;
-                while (Opacity < 1d && StateAnimWindow == StateAnimateWindow.OpacityHidePlus)
-                {
-                    await Task.Run(() =>
-                    {
-                        Opacity += 0.009d;
-                        if (i++ % 6 == 0) Thread.Sleep(1);
-                        Update();
-                    });
-                }
-                if (StateAnimWindow == StateAnimateWindow.OpacityHidePlus)
-                {
-                    FormFlags.FormActivity.Value = true;
-                    WindowState = FormWindowState.Normal;
-                    Opacity = 1d;
-                    StateAnimWindow = StateAnimateWindow.Active;
-                }
-            });
-            ThreadWindow.Start();
+                Opacity += 0.009d;
+                if (i++ % 6 == 0) Thread.Sleep(1);
+                Update();
+            }*/
+            if (StateAnimWindow == StateAnimateWindow.OpacityHidePlus)
+            {
+                FormFlags.FormActivity.Value = true;
+                WindowState = FormWindowState.Normal;
+                if (!Focused) Activate();
+                Opacity = 1d;
+                StateAnimWindow = StateAnimateWindow.Active;
+            }
         }
 
         /// <summary>
@@ -1025,30 +997,24 @@ namespace AAC
         /// </summary>
         public void UnfoldingMoveApplication()
         {
-            if (ThreadWindow?.IsAlive ?? false) ThreadWindow.Interrupt();
             StateAnimWindow = StateAnimateWindow.MoveHidePlus;
-            ThreadWindow = new(async () =>
+            int i = 0;
+            /*while (Opacity < 1d && StateAnimWindow == StateAnimateWindow.MoveHidePlus)
             {
-                int i = 0;
-                while (Opacity < 1d && StateAnimWindow == StateAnimateWindow.MoveHidePlus)
-                {
-                    await Task.Run(() =>
-                    {
-                        Opacity += 0.02d;
-                        Location = new(Location.X, Location.Y > SavePositionAnimateWindow.Y ? Location.Y - 3 : SavePositionAnimateWindow.Y);
-                        if (i++ % 9 == 0) Thread.Sleep(1);
-                        Update();
-                    });
-                }
-                if (StateAnimWindow == StateAnimateWindow.MoveHidePlus)
-                {
-                    FormFlags.FormActivity.Value = true;
-                    WindowState = FormWindowState.Normal;
-                    Opacity = 1d;
-                    StateAnimWindow = StateAnimateWindow.Active;
-                }
-            });
-            ThreadWindow.Start();
+                Opacity += 0.02d;
+                Location = new(Location.X, Location.Y > SavePositionAnimateWindow.Y ? Location.Y - 3 : SavePositionAnimateWindow.Y);
+                if (i++ % 9 == 0) Thread.Sleep(1);
+                Update();
+            }*/
+            if (StateAnimWindow == StateAnimateWindow.MoveHidePlus)
+            {
+                Location = SavePositionAnimateWindow;
+                FormFlags.FormActivity.Value = true;
+                WindowState = FormWindowState.Normal;
+                if (!Focused) Activate();
+                Opacity = 1d;
+                StateAnimWindow = StateAnimateWindow.Active;
+            }
         }
 
         /// <summary>
@@ -1056,30 +1022,23 @@ namespace AAC
         /// </summary>
         public void FoldingMoveApplication()
         {
-            if (ThreadWindow?.IsAlive ?? false) ThreadWindow.Interrupt();
             StateAnimWindow = StateAnimateWindow.MoveHideMinus;
-            ThreadWindow = new(async () =>
+            SavePositionAnimateWindow = Location;
+            int i = 0;
+            /*while (Opacity > 0.1d && StateAnimWindow == StateAnimateWindow.MoveHideMinus)
             {
-                int i = 0;
-                while (Opacity > 0.1d && StateAnimWindow == StateAnimateWindow.MoveHideMinus)
-                {
-                    await Task.Run(() =>
-                    {
-                        Opacity -= 0.02d;
-                        Location = new(Location.X, Location.Y + 3);
-                        if (i++ % 9 == 0) Thread.Sleep(1);
-                        Update();
-                    });
-                }
-                if (StateAnimWindow == StateAnimateWindow.MoveHideMinus)
-                {
-                    Opacity = 0d;
-                    FormFlags.FormActivity.Value = false;
-                    WindowState = FormWindowState.Minimized;
-                    StateAnimWindow = StateAnimateWindow.Hide;
-                }
-            });
-            ThreadWindow.Start();
+                Opacity -= 0.02d;
+                Location = new(Location.X, Location.Y + 3);
+                if (i++ % 9 == 0) Thread.Sleep(1);
+                Update();
+            }*/
+            if (StateAnimWindow == StateAnimateWindow.MoveHideMinus)
+            {
+                Opacity = 0d;
+                FormFlags.FormActivity.Value = false;
+                WindowState = FormWindowState.Minimized;
+                StateAnimWindow = StateAnimateWindow.Hide;
+            }
         }
 
         /// <summary>
@@ -1087,28 +1046,20 @@ namespace AAC
         /// </summary>
         public void FoldingOpacityApplication()
         {
-            if (ThreadWindow?.IsAlive ?? false) ThreadWindow.Interrupt();
             StateAnimWindow = StateAnimateWindow.OpacityHideMinus;
-            ThreadWindow = new(async () =>
+            int i = 0;
+            /*while (Opacity > 0.45d && StateAnimWindow == StateAnimateWindow.OpacityHideMinus)
             {
-                int i = 0;
-                while (Opacity > 0.45d && StateAnimWindow == StateAnimateWindow.OpacityHideMinus)
-                {
-                    await Task.Run(() =>
-                    {
-                        Opacity -= 0.009d;
-                        if (i++ % 6 == 0) Thread.Sleep(1);
-                        Update();
-                    });
-                }
-                if (StateAnimWindow == StateAnimateWindow.OpacityHideMinus)
-                {
-                    Opacity = 0.45d;
-                    FormFlags.FormActivity.Value = false;
-                    StateAnimWindow = StateAnimateWindow.HalfHide;
-                }
-            });
-            ThreadWindow.Start();
+                Opacity -= 0.009d;
+                if (i++ % 6 == 0) Thread.Sleep(1);
+                Update();
+            }*/
+            if (StateAnimWindow == StateAnimateWindow.OpacityHideMinus)
+            {
+                Opacity = 0.45d;
+                FormFlags.FormActivity.Value = false;
+                StateAnimWindow = StateAnimateWindow.HalfHide;
+            }
         }
 
         /// <summary>

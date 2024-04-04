@@ -3,19 +3,24 @@
     public partial class IELImageButton : UserControl
     {
         /// <summary>
-        /// Свойство неактивного цвета
+        /// Индекс состояния
         /// </summary>
-        private Color? DisactiveColor { get; set; }
+        public int IndexState { get; private set; }
 
         /// <summary>
-        /// Свойство Активного цвета
+        /// Неактивные изображения при состояниях
         /// </summary>
-        private Color? ActiveColor { get; set; }
+        public List<Image> ImageMouseLeave { get; set; }
+
+        /// <summary>
+        /// Активные изображения при состояниях
+        /// </summary>
+        public List<Image> ImageMouseEnter { get; set; }
 
         /// <summary>
         /// Оффсет цвета
         /// </summary>
-        private int OffsetColor { get; set; }
+        public readonly int OffsetColor;
 
         /// <summary>
         /// Инициализировать объект кнопки
@@ -23,6 +28,10 @@
         public IELImageButton()
         {
             InitializeComponent();
+            pb.Size = Size;
+            IndexState = 0;
+            ImageMouseLeave = [];
+            ImageMouseEnter = [];
             OffsetColor = 20;
         }
 
@@ -33,13 +42,11 @@
         /// <param name="e">Объект информации о событии</param>
         private void ElementImage_MouseEnter(object sender, EventArgs e)
         {
-            if (DisactiveColor == null) DisactiveColor = BackColor;
-            BackColor = Color.FromArgb(
-                BackColor.R <= (255 - OffsetColor) ? BackColor.R + OffsetColor : 255 - (OffsetColor - (255 - BackColor.R)),
-                BackColor.G <= (255 - OffsetColor) ? BackColor.G + OffsetColor : 255 - (OffsetColor - (255 - BackColor.G)),
-                BackColor.B <= (255 - OffsetColor) ? BackColor.B + OffsetColor : 255 - (OffsetColor - (255 - BackColor.B))
-                );
-            if (ActiveColor == null) ActiveColor = BackColor;
+            if (IndexState < ImageMouseEnter.Count)
+            {
+                pb.Image = ImageMouseEnter[IndexState];
+            }
+            else throw new Exception($"Для данного состояния \"{IndexState}\" активное изображение не найдено");
         }
 
         /// <summary>
@@ -49,7 +56,11 @@
         /// <param name="e">Объект информации о событии</param>
         private void ElementImage_MouseLeave(object sender, EventArgs e)
         {
-            BackColor = DisactiveColor ?? Color.White;
+            if (IndexState < ImageMouseLeave.Count)
+            {
+                pb.Image = ImageMouseLeave[IndexState];
+            }
+            else throw new Exception($"Для данного состояния \"{IndexState}\" неактивное изображение не найдено");
         }
 
         /// <summary>
@@ -59,11 +70,11 @@
         /// <param name="e">Объект информации о событии</param>
         private void IELImageButton_MouseDown(object sender, MouseEventArgs e)
         {
-            BackColor = Color.FromArgb(
-                BackColor.R <= (255 - OffsetColor) ? BackColor.R + OffsetColor : 255 - (OffsetColor - (255 - BackColor.R)),
-                BackColor.G <= (255 - OffsetColor) ? BackColor.G + OffsetColor : 255 - (OffsetColor - (255 - BackColor.G)),
-                BackColor.B <= (255 - OffsetColor) ? BackColor.B + OffsetColor : 255 - (OffsetColor - (255 - BackColor.B))
-                );
+            if (IndexState < ImageMouseLeave.Count)
+            {
+                pb.Image = ImageMouseLeave[IndexState];
+            }
+            else throw new Exception($"Для данного состояния \"{IndexState}\" неактивное изображение не найдено");
         }
 
         /// <summary>
@@ -73,7 +84,8 @@
         /// <param name="e">Объект информации о событии</param>
         private void IELImageButton_MouseUp(object sender, MouseEventArgs e)
         {
-            BackColor = ActiveColor ?? Color.White;
+            IndexState = IndexState < ImageMouseEnter.Count - 1 ? IndexState + 1 : 0;
+            pb.Image = ImageMouseEnter[IndexState];
         }
     }
 }

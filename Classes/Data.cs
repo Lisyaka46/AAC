@@ -86,11 +86,6 @@ namespace AAC.Classes
             public BooleanFlags PanelDeveloper { get; set; } = BooleanFlags.False;
 
             /// <summary>
-            /// Статус Голосовых комманд
-            /// </summary>
-            public StatusFlags AudioCommand { get; set; } = StatusFlags.NotActive;
-
-            /// <summary>
             /// Статус Активности клавиш на клавиатуре
             /// </summary>
             public DialogWindowStatus ResultConfirmationAction { get; set; } = DialogWindowStatus.Cancel;

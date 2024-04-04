@@ -1504,8 +1504,9 @@
             MaximumSize = new Size(2000, 2000);
             MinimizeBox = false;
             Name = "MainApplication";
+            SizeGripStyle = SizeGripStyle.Hide;
             StartPosition = FormStartPosition.CenterScreen;
-            Deactivate += Application_Deactivate;
+            WindowState = FormWindowState.Minimized;
             Shown += ApplicationCLR_Shown;
             ((System.ComponentModel.ISupportInitialize)Internet_Info).EndInit();
             ((System.ComponentModel.ISupportInitialize)pbVoiceButton).EndInit();
