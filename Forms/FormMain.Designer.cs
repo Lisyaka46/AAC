@@ -43,6 +43,7 @@
             lDeveloper_RGB_Text = new Label();
             pDeveloper = new Panel();
             pDeveloperElements = new Panel();
+            lGithub = new LinkLabel();
             lDeveloper_SAW = new Label();
             clbDeveloperFlags = new CheckedListBox();
             lDeveloper_SongColor = new Label();
@@ -353,6 +354,7 @@
             // 
             // pDeveloperElements
             // 
+            pDeveloperElements.Controls.Add(lGithub);
             pDeveloperElements.Controls.Add(lDeveloper_SAW);
             pDeveloperElements.Controls.Add(clbDeveloperFlags);
             pDeveloperElements.Controls.Add(lDeveloper_SongColor);
@@ -383,6 +385,18 @@
             pDeveloperElements.Size = new Size(269, 730);
             pDeveloperElements.TabIndex = 53;
             pDeveloperElements.Click += DeveloperPanelClick;
+            // 
+            // lGithub
+            // 
+            lGithub.AutoSize = true;
+            lGithub.ForeColor = Color.Black;
+            lGithub.LinkColor = Color.FromArgb(128, 64, 64);
+            lGithub.Location = new Point(202, 273);
+            lGithub.Name = "lGithub";
+            lGithub.Size = new Size(49, 15);
+            lGithub.TabIndex = 75;
+            lGithub.TabStop = true;
+            lGithub.Text = "GutHub";
             // 
             // lDeveloper_SAW
             // 
@@ -427,7 +441,7 @@
             bDeveloperLOG.Cursor = Cursors.Hand;
             bDeveloperLOG.FlatStyle = FlatStyle.Flat;
             bDeveloperLOG.Font = new Font("Segoe UI Semibold", 9F, FontStyle.Bold);
-            bDeveloperLOG.Location = new Point(162, 267);
+            bDeveloperLOG.Location = new Point(144, 269);
             bDeveloperLOG.Name = "bDeveloperLOG";
             bDeveloperLOG.Size = new Size(45, 23);
             bDeveloperLOG.TabIndex = 66;
@@ -659,7 +673,7 @@
             LlAutorContact.Cursor = Cursors.Hand;
             LlAutorContact.LinkBehavior = LinkBehavior.HoverUnderline;
             LlAutorContact.LinkColor = Color.PaleGreen;
-            LlAutorContact.Location = new Point(64, 3);
+            LlAutorContact.Location = new Point(64, 6);
             LlAutorContact.Name = "LlAutorContact";
             LlAutorContact.Size = new Size(127, 15);
             LlAutorContact.TabIndex = 4;
@@ -1017,7 +1031,7 @@
             // 
             // pHitCommandConsole
             // 
-            pHitCommandConsole.BackColor = Color.Black;
+            pHitCommandConsole.BackColor = Color.FromArgb(40, 40, 10);
             pHitCommandConsole.BorderStyle = BorderStyle.FixedSingle;
             pHitCommandConsole.Location = new Point(271, 526);
             pHitCommandConsole.Name = "pHitCommandConsole";
@@ -1367,20 +1381,17 @@
             // 
             // pUppingMenu
             // 
-            pUppingMenu.BackColor = Color.FromArgb(38, 34, 18);
+            pUppingMenu.BackColor = Color.FromArgb(24, 26, 18);
             pUppingMenu.BorderStyle = BorderStyle.FixedSingle;
             pUppingMenu.Controls.Add(bAllSettings);
             pUppingMenu.Controls.Add(pbIconApplication);
             pUppingMenu.Controls.Add(lTitleApplication);
             pUppingMenu.Controls.Add(bThanksis);
             pUppingMenu.Controls.Add(LlAutorContact);
-            pUppingMenu.Location = new Point(0, -10);
+            pUppingMenu.Location = new Point(-1, -1);
             pUppingMenu.Name = "pUppingMenu";
-            pUppingMenu.Size = new Size(726, 28);
+            pUppingMenu.Size = new Size(726, 34);
             pUppingMenu.TabIndex = 45;
-            pUppingMenu.Enter += UpperPanelActivate;
-            pUppingMenu.Leave += UpperPanelDiactivate;
-            pUppingMenu.MouseDoubleClick += MovingFormSenterScreen;
             pUppingMenu.MouseDown += MovingApplicationActivate;
             pUppingMenu.MouseUp += MovingApplicationDiactivate;
             // 
@@ -1391,18 +1402,17 @@
             bAllSettings.Cursor = Cursors.Hand;
             bAllSettings.FlatStyle = FlatStyle.Popup;
             bAllSettings.ForeColor = Color.Sienna;
-            bAllSettings.Location = new Point(532, -2);
+            bAllSettings.Location = new Point(532, 2);
             bAllSettings.Name = "bAllSettings";
             bAllSettings.Size = new Size(77, 23);
             bAllSettings.TabIndex = 5;
             bAllSettings.Text = "Настройки";
             bAllSettings.UseVisualStyleBackColor = false;
-            bAllSettings.Click += BSettings_Click;
             // 
             // pbIconApplication
             // 
             pbIconApplication.Image = (Image)resources.GetObject("pbIconApplication.Image");
-            pbIconApplication.Location = new Point(5, 0);
+            pbIconApplication.Location = new Point(5, 4);
             pbIconApplication.Name = "pbIconApplication";
             pbIconApplication.Size = new Size(19, 19);
             pbIconApplication.SizeMode = PictureBoxSizeMode.Zoom;
@@ -1416,7 +1426,7 @@
             lTitleApplication.AutoSize = true;
             lTitleApplication.Font = new Font("Segoe UI Black", 11.25F, FontStyle.Bold);
             lTitleApplication.ForeColor = Color.White;
-            lTitleApplication.Location = new Point(26, 1);
+            lTitleApplication.Location = new Point(26, 4);
             lTitleApplication.Name = "lTitleApplication";
             lTitleApplication.Size = new Size(40, 20);
             lTitleApplication.TabIndex = 44;
@@ -1431,7 +1441,7 @@
             bThanksis.Cursor = Cursors.Hand;
             bThanksis.FlatStyle = FlatStyle.Popup;
             bThanksis.ForeColor = Color.Sienna;
-            bThanksis.Location = new Point(614, -1);
+            bThanksis.Location = new Point(614, 3);
             bThanksis.Name = "bThanksis";
             bThanksis.Size = new Size(106, 22);
             bThanksis.TabIndex = 6;
@@ -1467,12 +1477,10 @@
             // 
             // pActivateUpperMenu
             // 
-            pActivateUpperMenu.Location = new Point(-1, 6);
+            pActivateUpperMenu.Location = new Point(-1, 7);
             pActivateUpperMenu.Name = "pActivateUpperMenu";
             pActivateUpperMenu.Size = new Size(725, 18);
             pActivateUpperMenu.TabIndex = 46;
-            pActivateUpperMenu.Click += UpperPanelActivate;
-            pActivateUpperMenu.MouseEnter += UpperPanelActivate;
             // 
             // label1
             // 
@@ -1652,5 +1660,6 @@
         private GUI.IELButtonMPanel PAC_bDeleteLabel;
         private GUI.IELButtonMPanel PAC_bActivateLabel;
         private GUI.IELBuffer PAC_Buffer;
+        private LinkLabel lGithub;
     }
 }

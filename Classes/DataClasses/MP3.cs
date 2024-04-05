@@ -16,7 +16,6 @@ namespace AAC.Classes.DataClasses
     {
         private const string Dir = $"Data/Sound";
 
-
         /// <summary>
         /// Количество каналов воспроизведения
         /// </summary>

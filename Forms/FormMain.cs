@@ -7,12 +7,9 @@ using System.Text.RegularExpressions;
 using static AAC.Classes.AnimationDL.Animate.AnimColor;
 using static AAC.Classes.AnimationDL.Animate.AnimFormule;
 using static AAC.Classes.AnimationDL.Animate.AnimText;
-using static AAC.Classes.Data;
-using static AAC.Classes.DataClasses.SettingsData;
 using static AAC.Classes.MainTheme;
 using static AAC.Forms_Functions;
 using static AAC.Startcs;
-using System.Reflection;
 
 namespace AAC
 {
@@ -200,7 +197,7 @@ namespace AAC
             lBorderLabelUp.SendToBack();
             lBorderLabelDown.SendToBack();
 
-
+            pDeveloper.BringToFront();
 
             UpdateTheme(MainData.MainThemeData.ActivityTheme);
             VoiceButtonImageUpdate(MainData.InputVoiceDevice.VoiceStatus, false);
@@ -218,6 +215,7 @@ namespace AAC
             bRebootApplication.MouseHover += (sender, e) => ActivateLabelInfo("Перезагружает программу");
             bRebootApplication.MouseLeave += (sender, e) => DisactivateLabelInfo();
 
+            pUppingMenu.MouseDoubleClick += (sender, e) => MovingFormSenterScreen();
 
             pDeveloper.MouseWheel += (sender, e) => { MiniFunctions.UpdateVScrollBar(sbhDebeloper, e.Delta); };
             sbhDebeloper.ValueChanged += (sender, e) => { MiniFunctions.MoveElementinVScrollBar(pDeveloperElements, sbhDebeloper, 3); };
@@ -357,7 +355,27 @@ namespace AAC
 
             sbhDebeloper.Size = new(sbhDebeloper.Size.Width, pDeveloper.Size.Height);
 
-            pUppingMenu.Location = new(pUppingMenu.Location.X, -22);
+            pUppingMenu.Location = new(pUppingMenu.Location.X, -27);
+            pActivateUpperMenu.MouseEnter += (sender, e) =>
+            {
+                if (FormFlags.FormActivity.Value) UpperPanelActivate();
+            };
+            pUppingMenu.MouseEnter += (sender, e) =>
+            {
+                if (!FormFlags.FormActivity.Value) UpperPanelActivate();
+            };
+            pUppingMenu.MouseLeave += (sender, e) =>
+            {
+                if (FormFlags.ActivateUppingPanel.Value && !FormFlags.FormActivity.Value &&
+                (Cursor.Position.Y - Location.Y > pUppingMenu.Height - 3 || Cursor.Position.Y - Location.Y <= 1 || Cursor.Position.X - Location.X <= 1 || Cursor.Position.X - Location.X > pUppingMenu.Width - 3)
+                )
+                    UpperPanelDiactivate();
+            };
+            tbInput.Enter += (sender, e) =>
+            {
+                if (FormFlags.ActivateUppingPanel.Value) UpperPanelDiactivate();
+                else if (FormFlags.ActiveSettingsMiniPanel.Value) PanelSettingsDiactivate();
+            };
 
             lInformationCursor.Hide();
             tbOutput.Size = new(771, 467);
@@ -393,11 +411,26 @@ namespace AAC
 
             lActiveitedSoftCommand.Text = "Soft-Команды отключены";
 
-            if ((bool)MainData.Settings.Developer_Mode) ObjLog.LOGTextAppend("Объявлено что программу запустил разработчик");
+            if ((bool)MainData.Settings.Developer_Mode)
+            {
+                ObjLog.LOGTextAppend("Объявлено что программу запустил разработчик");
+                lGithub.LinkClicked += (sender, e) =>
+                {
+                    Process.Start(new ProcessStartInfo("https://github.com") { UseShellExecute = true });
+                    FoldingMoveApplication();
+                };
+            }
             else pDeveloper.Hide();
 
             CapsLock_Info.Image = Control.IsKeyLocked(Keys.CapsLock) ?
                         Image.FromFile(@"Data\Image\Up-A.gif") : Image.FromFile(@"Data\Image\Down-a.gif");
+
+            bAllSettings.Click += (sender, e) =>
+            {
+                ObjLog.LOGTextAppend("Была активирована форма настроек");
+                Apps.WindowSettings = new();
+                Apps.WindowSettings.ShowDialog();
+            };
         }
 
         /// <summary>
@@ -676,8 +709,6 @@ namespace AAC
                     MainData.Flags.PanelDeveloper = MainData.Flags.PanelDeveloper == BooleanFlags.True ? BooleanFlags.False : BooleanFlags.True;
                     ConstAnimMove ConstantFormule = new(Coords.Item1, Coords.Item2, 10);
                     ConstantFormule.InitAnimFormule(pDeveloper, Formules.QuickTransition, new ConstAnimMove(pDeveloper.Location.Y), AnimationStyle.XY);
-                    pDeveloper.BringToFront();
-                    pDeveloper.Focus();
                 }
             }
         }
@@ -798,7 +829,7 @@ namespace AAC
         /// </summary>
         private void PanelSettingsActivate()
         {
-            if (FormFlags.ActivateUppingPanel.Value) UpperPanelDiactivate(null, null);
+            if (FormFlags.PAC_PanelActivate.Value) pSettings.BringToFront();
             FormFlags.ActiveSettingsMiniPanel.Value = true;
             lSettingsVolume.Text = "Загрузка...";
             pSettingsVolumeDivace.Size = new(144, 24);
@@ -866,13 +897,13 @@ namespace AAC
                 ObjLog.LOGTextAppend($"+# {StateAnimWindow}");
                 if (StateAnimWindow == StateAnimateWindow.Hide) UnfoldingMoveApplication();
                 else if (StateAnimWindow == StateAnimateWindow.HalfHide) UnfoldingOpacityApplication();
-                if (FormFlags.ActivateUppingPanel.Value && !FormFlags.MovingApplication.Value) UpperPanelDiactivate(null, null);
+                if (FormFlags.ActivateUppingPanel.Value && !FormFlags.MovingApplication.Value) UpperPanelDiactivate();
                 tbInput.Focus();
             };
             Deactivate += (sender, e) =>
             {
                 ObjLog.LOGTextAppend($"-# {StateAnimWindow}");
-                if (FormFlags.ActivateUppingPanel.Value) UpperPanelDiactivate(null, null);
+                if (FormFlags.ActivateUppingPanel.Value) UpperPanelDiactivate();
                 FoldingOpacityApplication();
             };
         }
@@ -932,21 +963,21 @@ namespace AAC
             ConsoleCommand.ReadConsoleCommand(MainData.MainCommandData.MassConsoleCommand, "help");
         }
 
-        private void UpperPanelActivate(object sender, EventArgs e)
+        private void UpperPanelActivate()
         {
             if (StateAnimWindow == StateAnimateWindow.HalfHide) Show();
             else pUppingMenu.Focus();
             if (FormFlags.ActiveSettingsMiniPanel.Value) PanelSettingsDiactivate();
             FormFlags.ActivateUppingPanel.Value = true;
-            ConstAnimMove ConstantFormule = new(pUppingMenu.Location.Y, -1, 9);
+            ConstAnimMove ConstantFormule = new(pUppingMenu.Location.Y, -1, 10);
             new ConstAnimMove(pUppingMenu.Location.X).InitAnimFormule(pUppingMenu, Formules.QuickTransition, ConstantFormule, AnimationStyle.XY);
             if (FormFlags.PAC_PanelActivate.Value) PAC_Disactivate(false);
         }
 
-        private void UpperPanelDiactivate(object sender, EventArgs e)
+        private void UpperPanelDiactivate()
         {
             FormFlags.ActivateUppingPanel.Value = false;
-            ConstAnimMove ConstantFormule = new(pUppingMenu.Location.Y, -22, 9);
+            ConstAnimMove ConstantFormule = new(pUppingMenu.Location.Y, -27, 10);
             new ConstAnimMove(pUppingMenu.Location.X).InitAnimFormule(pUppingMenu, Formules.QuickTransition, ConstantFormule, AnimationStyle.XY);
         }
 
@@ -986,7 +1017,11 @@ namespace AAC
             {
                 FormFlags.FormActivity.Value = true;
                 WindowState = FormWindowState.Normal;
-                if (!Focused) Activate();
+                if (!FormFlags.MovingApplication.Value && !FormFlags.ActivateUppingPanel.Value)
+                {
+                    tbInput.Focus();
+                    if (!Focused) Activate();
+                }
                 Opacity = 1d;
                 StateAnimWindow = StateAnimateWindow.Active;
             }
@@ -1011,6 +1046,7 @@ namespace AAC
                 Location = SavePositionAnimateWindow;
                 FormFlags.FormActivity.Value = true;
                 WindowState = FormWindowState.Normal;
+                tbInput.Focus();
                 if (!Focused) Activate();
                 Opacity = 1d;
                 StateAnimWindow = StateAnimateWindow.Active;
@@ -1100,13 +1136,6 @@ namespace AAC
             SavePositionAnimateWindow = Location;
         }
 
-        public void BSettings_Click(object sender, EventArgs e)
-        {
-            ObjLog.LOGTextAppend("Была активирована форма настроек");
-            Apps.WindowSettings = new();
-            Apps.WindowSettings.ShowDialog();
-        }
-
         public void TbOutput_MouseClick(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Right && (Math.Abs(StartCursorMovingtbOutput.X - Cursor.Position.X) < 15 || FormFlags.PAC_PanelActivate.Value))
@@ -1125,6 +1154,12 @@ namespace AAC
         /// <param name="LabelAccessDetect">PAC активируется с помощью LabelAccess</param>
         private void PAC_Activate(bool LabelAccessDetect = false)
         {
+            if (!FormFlags.PAC_PanelActivate.Value)
+            {
+                if (FormFlags.ActivateUppingPanel.Value) UpperPanelDiactivate();
+                else if (FormFlags.ActiveSettingsMiniPanel.Value) PanelSettingsDiactivate();
+            }
+            else pMiniPanelOutput.BringToFront();
             const int OffsetX = 5, OffsetY = -30, WidthA = 212, HeightA = 221;
             int XPos = Cursor.Position.X - Apps.MainForm.Location.X + OffsetX, YPos = Cursor.Position.Y - Apps.MainForm.Location.Y + OffsetY;
             int ConstX, ConstY;
@@ -1605,7 +1640,10 @@ namespace AAC
             }
         }
 
-        private void MovingFormSenterScreen(object sender, MouseEventArgs e)
+        /// <summary>
+        /// Централизовать главную форму
+        /// </summary>
+        public void MovingFormSenterScreen()
         {
             if (Screen.PrimaryScreen != null)
             {

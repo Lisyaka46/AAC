@@ -56,10 +56,10 @@ namespace AAC.Classes.DataClasses
             [
                 new("Default", "Системная тема программы",
                 [
-                    Color.Black, Color.Black, Color.Black, Color.Black,
-                    Color.Black, Color.Black, Color.Black, Color.Black,
-                    Color.Black, Color.Black, Color.Black, Color.Black,
-                    Color.Black, Color.Black, Color.Black,
+                    Color.Black, Color.FromArgb(18, 14, 20), Color.FromArgb(24, 26, 18), Color.Black,
+                    Color.Black, Color.FromArgb(15, 15, 15), Color.DimGray, Color.FromArgb(3, 4, 12),
+                    Color.FromArgb(40, 40, 10), Color.FromArgb(38, 34, 18), Color.FromArgb(38, 34, 18), Color.FromArgb(250, 250, 250),
+                    Color.FromArgb(225, 225, 225), Color.FromArgb(250, 240, 180), Color.FromArgb(70, 140, 100),
                 ]),
             ];
             MassTheme.AddRange(ReadingAllThemes());

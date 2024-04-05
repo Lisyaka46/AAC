@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using static AAC.Classes.AnimationDL.Animate.AnimFormule;
 using static AAC.Classes.AnimationDL.Animate.AnimText;
 using static AAC.Startcs;
 
@@ -24,7 +25,9 @@ namespace AAC
                 [
                     new ConsoleCommand("settings", null, "Открывает глобальные настройки", (param) =>
                     {
-                        Apps.MainForm.BSettings_Click(null, null);
+                        ObjLog.LOGTextAppend($"Была распознана команда settings");
+                        Apps.WindowSettings = new();
+                        Apps.WindowSettings.ShowDialog();
                         return Task.FromResult(CommandStateResult.Completed);
                     }),
                     new ConsoleCommand("clear", null, "Очистка выводимых данных", (param) =>
@@ -375,46 +378,91 @@ namespace AAC
         {
             return
             [
-                new VoiceCommand(["ты работаешь", "ты жив", "состояние голоса", "состояние госовых команд"], "Воспроизводит звук подтверждая что голосовые команды работают", () =>
+                new VoiceCommand([
+                    "ты работаешь",
+                    "ты жив",
+                    "состояние голоса",
+                    "состояние госовых команд"], "Воспроизводит звук подтверждая что голосовые команды работают", () =>
                 {
                     MainData.MainMP3.PlaySound("Complete");
                     return Task.FromResult(CommandStateResult.Completed);
                 }),
-                new VoiceCommand(["закрой программу", "закрыть программу", "закрыть приложение", "закрой приложение"], "Завершает работу программы", () =>
+                new VoiceCommand([
+                    "закрыть программу",
+                    "закрой программу",
+                    "закрыть приложение",
+                    "закрой приложение"], "Завершает работу программы", () =>
                 {
                     ConsoleCommand.ReadConsoleCommand(MainData.MainCommandData.MassConsoleCommand, "close");
                     return Task.FromResult(CommandStateResult.Completed);
                 }),
-                new VoiceCommand(["очистить", "очисти", "очистить вывод", "очисти вывод", "очистить консоль", "очисти консоль"], "Очищает вывод консоли", () =>
+                new VoiceCommand([
+                    "очистить",
+                    "очисти",
+                    "очистить вывод",
+                    "очисти вывод",
+                    "очистить консоль",
+                    "очисти консоль"], "Очищает вывод консоли", () =>
                 {
                     ConsoleCommand.ReadConsoleCommand(MainData.MainCommandData.MassConsoleCommand, "clear");
                     return Task.FromResult(CommandStateResult.Completed);
                 }),
-                new VoiceCommand(["активировать программу", "активируй программу", "развернуть", "развернуть программу", "разверни программу"], "Разворачивает программу делая её активным окном", () =>
+                new VoiceCommand([
+                    "активировать программу",
+                    "активируй программу",
+                    "развернуть",
+                    "развернуть программу",
+                    "разверни программу"], "Разворачивает программу делая её активным окном", () =>
                 {
-                    if (Apps.MainForm.StateAnimWindow == StateAnimateWindow.Hide) Apps.MainForm.UnfoldingMoveApplication();
+                    if (Apps.MainForm.StateAnimWindow == StateAnimateWindow.Hide) Apps.MainForm.Activate();
+                    else if (Apps.MainForm.StateAnimWindow == StateAnimateWindow.HalfHide) Apps.MainForm.UnfoldingOpacityApplication();
                     return Task.FromResult(CommandStateResult.Completed);
                 }),
-                new VoiceCommand(["блок", "заблокировать компьютер", "заблокируй компьютер"], "Блокирует компьютер выводя начальный экран", () =>
+                new VoiceCommand([
+                    "блок",
+                    "заблокировать компьютер",
+                    "заблокируй компьютер"], "Блокирует компьютер выводя начальный экран", () =>
                 {
                     if (!DLLMethods.LockWorkStation()) throw new Win32Exception(Marshal.GetLastWin32Error());
                     return Task.FromResult(CommandStateResult.Completed);
                 }),
-                new VoiceCommand(["выключить голосовые команды", "выключи голосовые команды", "отключить голос", "отключи голос"], "Выключает голосовые команды", () =>
+                new VoiceCommand([
+                    "выключить голосовые команды",
+                    "выключи голосовые команды",
+                    "отключить голос",
+                    "отключи голос"], "Выключает голосовые команды", () =>
                 {
                     Apps.MainForm.VoiceButtonImageUpdate(InputVoiceCommandDevice.StatusVoiceCommand.Sleep, false);
                     MainData.InputVoiceDevice.Diactivate();
                     if (Apps.MainForm.StateAnimWindow != StateAnimateWindow.Active) MainData.MainMP3.PlaySound("Complete");
                     return Task.FromResult(CommandStateResult.Completed);
                 }),
-                new VoiceCommand(["свернуть", "свернуть программу", "сверни программу", "свернуть приложение", "сверни приложение"], "Сворачивает приложение", () =>
+                new VoiceCommand([
+                    "свернуть",
+                    "сверни",
+                    "свернуть программу",
+                    "сверни программу",
+                    "свернуть приложение",
+                    "сверни приложение"], "Сворачивает приложение", () =>
                 {
-                    if (Apps.MainForm.StateAnimWindow == StateAnimateWindow.Active) Apps.MainForm.FoldingMoveApplication();
+                    Apps.MainForm.FoldingMoveApplication();
                     return Task.FromResult(CommandStateResult.Completed);
                 }),
-                new VoiceCommand(["открыть рабочую директорию", "открой рабочую директорию", "открыть активную директорию", "открой активную диреторию"], "Сворачивает приложение", () =>
+                new VoiceCommand([
+                    "открыть рабочую директорию",
+                    "открой рабочую директорию",
+                    "открыть активную директорию",
+                    "открой активную диреторию"], "Сворачивает приложение", () =>
                 {
                     Process.Start("explorer.exe", Directory.GetCurrentDirectory());
+                    return Task.FromResult(CommandStateResult.Completed);
+                }),
+                new VoiceCommand([
+                    "централизовать", "централизуй",
+                    "централизовать приложение", "централизуй приложение",
+                    "централизовать программу", "централизуй программу"], "Сворачивает приложение", () =>
+                {
+                    Apps.MainForm.MovingFormSenterScreen();
                     return Task.FromResult(CommandStateResult.Completed);
                 }),
             ];
@@ -423,9 +471,6 @@ namespace AAC
         {
             switch (ID)
             {
-                case 7: // открой рабочую директорию
-                    Process.Start("explorer.exe", Directory.GetCurrentDirectory());
-                    return CommandStateResult.Completed;
                 case 8: // сверни всё
                     Apps.MainForm.Show();
                     if (DLLMethods.ShellGUID("DesktopVisualTrue")) MainData.MainMP3.PlaySound("Complete");
@@ -443,10 +488,7 @@ namespace AAC
                     return CommandStateResult.Completed;
                 case 14: // сколько времени
                     /*
-                    using System.Speech.Synthesis;
-
-namespace ConsoleApplication5
-    {
+        using System.Speech.Synthesis;
         class Program
         {
 
@@ -466,14 +508,6 @@ namespace ConsoleApplication5
 
             }
 
-        }
-    }
-    TimeTempus();
-                    return CommandStateResult.Completed;
-            }
-            return new CommandStateResult(ResultState.Failed,
-                $">>> Voice command ID: {ID} is Invalid",
-                $"Голосовая команда ID: {ID} не нраспознана");
         }*/
     }
 }
