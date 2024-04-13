@@ -38,10 +38,25 @@ namespace AAC
             try
             {
                 Apps.Starting = new();
-                Task.Run(() => Application.Run(Apps.Starting));
+                MainData.MainMP3.PlaySound("StartingSound");
+                /*Task.Run(() =>
+                {
+                    MainData.MainMP3.PlaySound("StartingSound");
+                    Application.Run(Apps.Starting);
+                });*/
 
                 Apps.MainForm = new();
-                while (Apps.Starting.Visible);
+                Task.Run(() =>
+                {
+                    while (Apps.Starting.Opacity > 0d)
+                    {
+                        Apps.Starting.Opacity -= 0.009d;
+                        Thread.Sleep(1);
+                    }
+                    Apps.Starting.Opacity = 0d;
+                    Apps.Starting.Visible = false;
+                    Apps.Starting.Close();
+                });
 
                 ObjLog.LOGTextAppend("Программа активируется");
 

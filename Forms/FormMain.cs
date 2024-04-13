@@ -99,6 +99,9 @@ namespace AAC
         //
         private int IndexConsoleReadBuffer = -1;
 
+        //
+        string[] AllNameHitCommand;
+
         /// <summary>
         /// Сохранённая позиция окна для анимации сворачивания/разворачивания
         /// </summary>
@@ -164,6 +167,7 @@ namespace AAC
 
             StateAnimWindow = StateAnimateWindow.HalfHide;
 
+            AllNameHitCommand = [.. MainData.MainCommandData.MassConsoleCommand.Select((i) => { return i.WritingCommandName(); })];
             ControlKey = [];
             LabelHitCommand = [];
             ActivatePACPanelPage = pmpMain;
@@ -523,7 +527,7 @@ namespace AAC
         {
             ControlKey.Remove(e.KeyCode);
             if (ControlKey.Count == 0) FormFlags.KeyActivity.Value = false;
-            lDeveloper_PressEndKey.Text = $"PressEndKey: <{(ControlKey.Count > 0 ? ControlKey[^1].ToString().Trim() : string.Empty)}>";
+            lDeveloper_PressEndKey.Text = $"PressEndKey: <{(ControlKey.Count > 0 ? ControlKey[^1].ToString() : string.Empty)}>";
             lDeveloper_ControlKey.Text = $"ControlKeys: <{string.Join(", ", ControlKey.AsEnumerable())}>";
             switch (e.KeyCode)
             {
@@ -600,21 +604,6 @@ namespace AAC
                     }
                     break;
 
-                // Активация команды
-                case Keys.Enter:
-                    if (FormFlags.ActiveIndexSwitchingHitPanel.Value && IndexActiveLabelHitCommand.HasValue)
-                    {
-                        FormFlags.ActiveIndexSwitchingHitPanel.Value = false;
-                        ObjLog.LOGTextAppend(IndexActiveLabelHitCommand.Value.ToString() + ", " + LabelHitCommand.Count.ToString());
-                        string Text = LabelHitCommand[IndexActiveLabelHitCommand.Value].Text;
-                        tbInput.Text = Text;
-                        IndexActiveLabelHitCommand = null;
-                        return;
-                    }
-                    DiactivateConsoleBuffer();
-                    ActivateConsoleCommand(null, null);
-                    break;
-
                 // Визуализация большого/маленького регистра печати
                 case Keys.Capital:
                 case Keys.ShiftKey:
@@ -661,40 +650,59 @@ namespace AAC
 
         private void TbInput_KeyDown(object sender, KeyEventArgs e)
         {
-            lDeveloper_PressEndKey.Text = $"PressEndKey: <{e.KeyCode.ToString().Trim()}>";
+            lDeveloper_PressEndKey.Text = $"PressEndKey: <{e.KeyCode}>";
             if (!ControlKey.Contains(e.KeyCode))
             {
                 ControlKey.Add(e.KeyCode);
                 lDeveloper_ControlKey.Text = $"ControlKeys: <{string.Join(", ", ControlKey.AsEnumerable())}>";
             }
             if (FormFlags.KeyActivity.Value) return;
-            ConstAnimMove constAnim = new(-14, 2, 10);
 
             FormFlags.KeyActivity.Value = true;
             MainData.MainMP3.PlaySound("ClickDown");
-            if (e.KeyCode == Keys.Capital || e.KeyCode == Keys.ShiftKey)
-                CapsLock_Info.Image = !IsKeyLocked(Keys.CapsLock) ? Image.FromFile(@"Data\Image\Up-A.gif") : Image.FromFile(@"Data\Image\Down-a.gif");
-            else if (((e.KeyCode == Keys.Right && tbInput.SelectionStart == tbInput.TextLength) || e.KeyCode == Keys.Return) && FormFlags.BufferConsole.Value)
+            switch (e.KeyCode)
             {
-                constAnim.Reverse().InitAnimFormule(lCountActiveBufferCommand, Formules.QuickTransition, null, AnimationStyle.XY);
-                FormFlags.BufferConsole.Value = false;
+                case Keys.Capital:
+                case Keys.ShiftKey:
+                    CapsLock_Info.Image = !IsKeyLocked(Keys.CapsLock) ? Image.FromFile(@"Data\Image\Up-A.gif") : Image.FromFile(@"Data\Image\Down-a.gif");
+                    break;
+                case Keys.Back:
+                    if (FormFlags.BufferConsole.Value)
+                    {
+                        new ConstAnimMove(2, -14, 10).InitAnimFormule(lCountActiveBufferCommand, Formules.QuickTransition, null, AnimationStyle.XY);
+                        FormFlags.BufferConsole.Value = false;
+                    }
+                    break;
+                case Keys.Return:
+                    if (!FormFlags.ActiveIndexSwitchingHitPanel.Value)
+                    {
+                        FormFlags.KeyActivity.Value = false;
+                        if (FormFlags.BufferConsole.Value)
+                        {
+                            new ConstAnimMove(2, -14, 10).InitAnimFormule(lCountActiveBufferCommand, Formules.QuickTransition, null, AnimationStyle.XY);
+                            FormFlags.BufferConsole.Value = false;
+                        }
+                        tbInput.Text = tbInput.Text.Replace("\n", string.Empty);
+                        tbInput.SelectionStart = tbInput.TextLength;
+                        if (FormFlags.ActiveIndexSwitchingHitPanel.Value && IndexActiveLabelHitCommand.HasValue)
+                        {
+                            FormFlags.ActiveIndexSwitchingHitPanel.Value = false;
+                            ObjLog.LOGTextAppend(IndexActiveLabelHitCommand.Value.ToString() + ", " + LabelHitCommand.Count.ToString());
+                            string Text = LabelHitCommand[IndexActiveLabelHitCommand.Value].Text;
+                            tbInput.Text = Text;
+                            IndexActiveLabelHitCommand = null;
+                            return;
+                        }
+                        tbOutput.Focus();
+                        DiactivateConsoleBuffer();
+                        ActivateConsoleCommand(null, null);
+                    }
+                    break;
+                case Keys.Apps:
+                    FormFlags.KeyActivity.Value = false;
+                    PAC_Activate();
+                    break;
             }
-            else if (e.KeyCode == Keys.Back && FormFlags.BufferConsole.Value)
-            {
-                constAnim.Reverse().InitAnimFormule(lCountActiveBufferCommand, Formules.QuickTransition, null, AnimationStyle.XY);
-                FormFlags.BufferConsole.Value = false;
-            }
-            else if (e.KeyCode == Keys.Return && !FormFlags.ActiveIndexSwitchingHitPanel.Value)
-            {
-                tbInput.Text = tbInput.Text.Replace("\n", string.Empty);
-                tbInput.SelectionStart = tbInput.TextLength;
-            }
-            else if (e.KeyCode == Keys.Apps)
-            {
-                FormFlags.KeyActivity.Value = false;
-                PAC_Activate();
-            }
-
         }
 
         public void DeveloperPanelClick(object sender, EventArgs e)
@@ -746,8 +754,7 @@ namespace AAC
         //
         private void IndexingHitCommands(string Text)
         {
-            string[] HitCommandText = [.. MainData.MainCommandData.MassConsoleCommand.Select((i) => { return i.WritingCommandName(); })];
-            HitCommandText = [.. HitCommandText.Where((i) => { return i.Contains(Text, StringComparison.CurrentCultureIgnoreCase); })];
+            string[] HitCommandText = [.. AllNameHitCommand.Where((i) => { return i.Contains(Text, StringComparison.CurrentCultureIgnoreCase); })];
             int MaxWigth = 0;
             ObjLog.LOGTextAppend($"{LabelHitCommand.Count} - {HitCommandText.Length}");
             if (LabelHitCommand.Count < HitCommandText.Length)

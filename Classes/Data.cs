@@ -66,7 +66,7 @@ namespace AAC.Classes
             ConsoleCommand[] MCC = Reading.ReadConsoleCommandDataBase();
             VoiceCommand[] MVC = Reading.ReadVoiceCommandDataBase();
             MainCommandData = new(MCC, MVC);
-            MainMP3 = new(10);
+            MainMP3 = new();
             InputVoiceDevice = new(MainCommandData, Settings.Activation_Microphone);
             MainThemeData = new();
             Flags = new();
